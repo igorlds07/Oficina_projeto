@@ -8,6 +8,6 @@ def conexao_bd():
         host='localhost',
         user='root',
         database='oficina_clientes',
-        password='Luna@2020'
+        password='Oficina@user'
     )
     return conexao
