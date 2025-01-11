@@ -1,0 +1,232 @@
+<!DOCTYPE html><!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Cliente</title>
+    <style>
+
+        /* Estilo para o conteúdo da página */
+        .main-content {
+            margin-left: 80px; /* Garante um espaço para os botões à esquerda */
+            padding: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin-bottom: 60px;
+        }
+
+        .menu {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column; /* Organiza os botões verticalmente */
+            gap: 10px; /* Espaçamento entre os botões */
+        }
+
+        .menu button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .menu button:hover {
+            background-color: #0056b3;;
+        }
+
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-group input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .form-group input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .form-group input[type="text"] {
+            margin-top: 20px;
+        }
+
+
+        /* Estilo para a mensagem de sucesso */
+        .success {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(40, 167, 69, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            animation: fadeIn 3s forwards;
+        }
+
+        /* Animação de fade-in */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+.messages {
+    position: fixed; /* Fixa as mensagens na tela */
+    top: 20px; /* Ajuste para que fique 20px abaixo do topo */
+    left: 50%; /* Posiciona a 50% da largura da tela */
+    transform: translateX(-50%); /* Centraliza perfeitamente na horizontal */
+    width: 80%; /* Largura das mensagens */
+    max-width: 600px; /* Tamanho máximo para que não fique muito grande */
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro para destacar a mensagem */
+    color: white; /* Cor do texto */
+    border-radius: 10px; /* Bordas arredondadas */
+    text-align: center; /* Centraliza o texto dentro da caixa */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra para dar efeito de profundidade */
+    z-index: 1000; /* Garante que a mensagem fique sobre outros elementos */
+}
+
+.alert {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.alert-success {
+    background-color: #28a745;
+}
+
+.alert-error {
+    background-color: #dc3545;
+}
+
+    </style>
+</head>
+<body>
+<!-- Exibir mensagens de sucesso ou erro -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="messages">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="menu">
+    <button onclick="window.location.href='/editar'">Editar Cliente</button>
+
+    <button onclick="window.location.href='/excluir_cliente'">Excluir Cliente</button>
+
+     <form action="/cadastro" method="GET">
+            <button onclick="window.location.href='/cadastro'">Voltar para o Cadastro</button>
+        </form>
+</div>
+
+<div class="container">
+    <h1>Editar Cliente</h1>
+    <form action="/editar" method="POST">
+        <div class="form-group">
+            <label for="cliente">Nome do Cliente:</label>
+            <input type="text" id="cliente" name="cliente" value="{{ cliente[1] if cliente else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" value="{{ cliente[1] if cliente else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="contato">Contato:</label>
+            <input type="text" id="contato" name="contato" value="{{ cliente[2] if cliente else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="veiculo">Veículo:</label>
+            <input type="text" id="veiculo" name="veiculo" value="{{ cliente[3] if cliente else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="data_entrada">Data de Entrada:</label>
+            <input type="date" id="data_entrada" name="data_entrada" value="{{ cliente[4] if cliente else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="data_saida">Data de Saída:</label>
+            <input type="date" id="data_saida" name="data_saida" value="{{ cliente[5] if cliente else '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="valor_orcamento">Valor Orçamento:</label>
+            <input type="number" id="valor_orcamento" name="valor_orcamento" value="{{ cliente[6] if cliente else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Atualizar Cliente">
+
+
+</body>
+</html>

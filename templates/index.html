@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Cliente</title>
+    <style>
+        /* Resetando margens e preenchimentos */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin-bottom: 80px; /* Para evitar sobreposição com o menu */
+        }
+
+        /* Estilo para o menu superior com botões */
+        .menu {
+            position: fixed;
+            top: 20px; /* Posiciona o menu mais para baixo */
+            left: 20px;
+            z-index: 1000; /* Certifica que o botão fique sempre sobreposto */
+            display: flex;
+            flex-direction: column;  /* Organiza os botões em coluna */
+            gap: 15px;
+        }
+
+        .menu button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .menu button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        /* Estilo para o conteúdo da página de cadastro */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 100px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            color: #333;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .form-group input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .form-group input[type="submit"]:hover {
+            background-color: #218838;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        /* Responsividade: ajuste para telas menores */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 0 15px; /* Espaçamento nas laterais */
+            }
+
+            .menu {
+                top: 10px; /* Ajuste da posição para dispositivos pequenos */
+                left: 10px;
+            }
+
+            .menu button {
+                padding: 10px 20px;  /* Menor tamanho de botão em telas pequenas */
+                font-size: 14px;  /* Menor tamanho de texto nos botões */
+            }
+
+            .container {
+                width: 100%;  /* Aumenta o tamanho do container */
+                padding: 15px; /* Reduz o preenchimento para dispositivos móveis */
+                margin-top: 100px;  /* Garante que o menu não sobreponha o conteúdo */
+            }
+
+            h1 {
+                font-size: 24px;  /* Reduz o tamanho do título em telas pequenas */
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 10px;  /* Ajuste de preenchimento em inputs */
+                font-size: 14px;  /* Reduz o tamanho da fonte em campos de input */
+            }
+
+            .form-group input[type="submit"] {
+                padding: 12px;  /* Ajuste de preenchimento para o botão de envio */
+            }
+        }
+
+        /* Estilo para a mensagem de sucesso */
+        .success {
+            position: absolute;
+            top; 120%;
+            margin-top: 20px;
+            background-color: rgba(40, 167, 69, 0.9); /* Cor de fundo verde */
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            visibility: hidden;
+            animation: fadeIn 3s forwards;
+        }
+
+        /* Animação de fade-in */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                visibility: hidden;
+            }
+            100% {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Menu Superior com Botões -->
+<div class="menu">
+    <!-- Botão que redireciona para a página de edição -->
+    <button onclick="window.location.href='/editar'">Editar Cliente</button>
+
+    <!-- Botão que redireciona para a página de clientes -->
+    <button onclick="window.location.href='/clientes'">Clientes</button>
+</div>
+
+<!-- Conteúdo da Página de Cadastro -->
+<div class="container">
+    <h1>Cadastrar Cliente</h1>
+    <form action="/cadastrar" method="POST">
+        <div class="form-group">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required>
+        </div>
+
+        <div class="form-group">
+            <label for="contato">Contato:</label>
+            <input type="text" id="contato" name="contato" required>
+        </div>
+
+        <div class="form-group">
+            <label for="veiculo">Veículo:</label>
+            <input type="text" id="veiculo" name="veiculo" required>
+        </div>
+
+        <div class="form-group">
+            <label for="data_entrada">Data de Entrada:</label>
+            <input type="date" id="data_entrada" name="data_entrada" required>
+        </div>
+
+        <div class="form-group">
+            <label for="data_saida">Data de Saída:</label>
+            <input type="date" id="data_saida" name="data_saida">
+        </div>
+
+        <div class="form-group">
+            <label for="valor_orcamento">Valor Orçamento:</label>
+            <input type="number" id="valor_orcamento" name="valor_orcamento" required>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Cadastrar Cliente">
+        </div>
+    </form>
+
+    <!-- Exibir a mensagem de sucesso, se houver -->
+    {% if success_message %}
+        <div class="success">
+            <p>{{ success_message }}</p>
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

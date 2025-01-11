@@ -1,0 +1,68 @@
+/* Estilo geral para o corpo */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding-top: 50px;
+}
+
+/* Container para o conteúdo */
+.container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para o título */
+header h1 {
+    text-align: center;
+    color: #333;
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+
+/* Estilo para o formulário */
+.form-group label {
+    font-weight: bold;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* Estilo para o botão */
+.btn-primary {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 4px;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+}
+
+/* Estilo para a mensagem de erro ou sucesso */
+#result {
+    margin-top: 20px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#result.success {
+    color: green;
+}
+
+#result.error {
+    color: red;
+}
