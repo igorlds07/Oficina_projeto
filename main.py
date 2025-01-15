@@ -17,6 +17,7 @@ def login_user():
     Caso o login e senha estejam corretos, o usuário será redirecionado para a página principal."""
 
     error = None
+    mensagem = None
 
     # Condição para ver se o usuário tem acesso ao app
     if request.method == 'POST':
@@ -43,10 +44,16 @@ def login_user():
                 error = 'Senha incorreta!'  # Se incorreta emeti está mensagem
 
         if error:
-            return render_template('login.html', error=error)  # Passando a mensagem de erro para o template
-        return redirect(url_for('index'))
+            return render_template('login.html', error=error, mensagem=mensagem)  # Passando a mensagem de erro para
+            # o template
 
-    return render_template('login.html')
+        mensagem = 'Acesso liberado'
+
+        if mensagem:
+
+            return redirect(url_for('index'))
+
+    return render_template('login.html', mensagem=mensagem)
 
 
 # Rota para exibir o formulário de cadastro
@@ -82,11 +89,12 @@ def cadastrar():
         cursor.close()
         conexao.close()
 
+        flash('Cadastrado com sucesso!', 'sucess')
         sucess_mesagge = 'Cadastrado com sucesso'
         print(sucess_mesagge)
 
         # Ao clicar o botão cadastrar e emetido a mensagem de 'sucesso' e  retorna a  página de cadastro
-        return render_template('index.html', sucess_mesagge=sucess_mesagge)
+        return render_template('index.html', )
 
     return render_template('index.html')  # Ao finalizar o processo retorna a página de cadastro novamente
 
@@ -103,47 +111,45 @@ def editar_cliente():
 
     # condição para atualizar o cliente
     if request.method == 'POST':
-        cliente = request.form['cliente']
         nome = request.form['nome']
-        contato = request.form['contato']
-        veiculo = request.form['veiculo']
-        data_entrada = request.form['data_entrada']
-        data_saida = request.form['data_saida']
-        valor_orcamentos = request.form['valor_orcamento']
-        valor_orcamento = float(valor_orcamentos)
-
-        # Condição para verificar se houve conexão com o banco de dados
-        if conexao is None:
-            return render_template('editar.html', error='Erro na conexão com o banco de dados.')
 
         cursor = conexao.cursor()
-        cursor.execute(f"SELECT * FROM clientes WHERE nome = %s", (cliente,))
+        cursor.execute(f"SELECT * FROM clientes WHERE nome = %s", (nome,))
 
-        cliente_existente = cursor.fetchone()
+        cliente = cursor.fetchone()
+        print(cliente)
 
         # UPDATE
-        if cliente_existente:
+        if cliente:
+            if 'nome' in request.form:
+                nome = request.form['nome']
+                contato = request.form['contato']
+                veiculo = request.form['veiculo']
+                data_entrada = request.form['data_entrada']
+                data_saida = request.form['data_saida']
+                valor_orcamentos = request.form['valor_orcamento']
+                valor_orcamento = float(valor_orcamentos)
 
             # Comando em SQL para atualizar o cliente escolhido
-            comando = ("""UPDATE clientes set nome = %s, contato = %s, veiculo = %s, data_entrada = %s,
-                          data_saida = %s, valor_orcamento = %s WHERE nome = %s""")
-            cursor.execute(comando, (nome, contato, veiculo, data_entrada, data_saida, valor_orcamento, cliente))
-            conexao.commit()
+                comando = ("""UPDATE clientes set nome = %s, contato = %s, veiculo = %s, data_entrada = %s,
+                              data_saida = %s, valor_orcamento = %s WHERE nome = %s""")
+                cursor.execute(comando, (nome, contato, veiculo, data_entrada, data_saida, valor_orcamento, cliente))
+                conexao.commit()
 
-            cursor.close()
-            conexao.close()  # Fecha a conexão com o  banco de dados
+                cursor.close()
+                conexao.close()  # Fecha a conexão com o  banco de dados
 
-            flash('Cliente atualizado com sucesso!', 'success')  # Mensagem de sucesso com flash
-            return redirect(url_for('editar_cliente'))  # Redireciona para o formulário de edição novamente
+                flash('Cliente atualizado com sucesso!', 'success')  # Mensagem de sucesso com flash
+                return redirect(url_for('editar_cliente'))  # Redireciona para o formulário de edição novamente
 
-        else:
-            cursor.close()  # Fechar o cursor se o cliente não for encontrado
+            else:
+                cursor.close()  # Fechar o cursor se o cliente não for encontrado
 
-            conexao.close()  # Fechar a conexão
+                conexao.close()  # Fechar a conexão
 
-            flash('Cliente não encontrado!', 'error')  # Mensagem de erro com flash
+                flash('Cliente não encontrado!', 'error')  # Mensagem de erro com flash
 
-            return redirect(url_for('editar_cliente'))  # Redi
+                return redirect(url_for('editar_cliente'))  # Redi
 
     return render_template('editar.html', cliente=None)  # Retorna a página e edição de clientes
 
@@ -184,7 +190,7 @@ def excluir_cliente():
                     print(f'excluindo cliente {nome_cliente}')
 
                     conexao.commit()
-                    print(f'cliente excluido comm  successo')
+                    print(f'cliente excluido com  successo')
                     flash(f'Cliente {nome_cliente} excluído com sucesso!', 'success')
                     return render_template('excluir_cliente.html', cliente=None)  # Redireciona após exclusão
 
@@ -242,6 +248,117 @@ def clientes():
 
     # Após todas as buscas retorna a página clientes.html
     return render_template('clientes.html', clientes=cliente_cadastrado)
+
+
+@app.route('/funcionarios', methods=['GET', 'POST'])
+def funcionarios():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+    funcionario_cadastrado = ()
+    if request.method == 'GET' and 'ver_todos' in request.args:
+        comando = 'SELECT * FROM funcionários;'
+        cursor.execute(comando,)
+        funcionario_cadastrado = cursor.fetchall()
+        print(funcionario_cadastrado)
+        return render_template('funcionarios.html', funcionarios=funcionario_cadastrado)
+
+    if request.method == 'POST':
+        nome = request.form['nome']
+        contato = request.form['contato']
+        cargo = request.form['cargo']
+
+        # Verifica se já existe um funcionário com esse nome (ou outro identificador)
+        comando = "INSERT INTO funcionários (nome, contato, cargo) VALUES (%s, %s, %s);"
+        cursor.execute(comando, (nome, contato, cargo))
+        conexao.commit()
+        flash('Funcionário cadastrado com sucesso !', 'sucess')
+        funcionarios_cadastrados = cursor.fetchall()
+
+        return render_template('funcionarios.html', funcionarios=funcionarios_cadastrados)
+
+    return render_template('funcionarios.html')
+
+
+@app.route('/funcionarios_atualizar', methods=['GET', 'POST'])
+def funcionarios_atualizar():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+    funcionario = None
+
+    if request.method == 'POST':
+
+        nome_funcionario = request.form.get('nome')
+
+        cursor.execute('SELECT * FROM funcionários WHERE nome = %s;', (nome_funcionario,))
+        funcionario_escolhido = cursor.fetchall()
+
+        if funcionario_escolhido:
+            funcionario_escolhido = funcionario_escolhido[0]
+
+            # Obter os valores do formulário
+            total_pecas = request.form.get('total_peças', 0)  # Valor padrão de 0 caso não seja enviado
+            valor_comissao = request.form.get('valor_comissão', 0)  # Valor padrão de 0 caso não seja enviado
+
+            # Recuperar os valores do banco de dados e substituir None por 0
+            total_pecas_db = funcionario_escolhido[0][5] if funcionario_escolhido[0][5] is not None else 0
+            valor_comissao_db = funcionario_escolhido[0][6] if funcionario_escolhido[0][6] is not None else 0
+
+            # Somar os valores antigos com os novos
+            novo_total_pecas = total_pecas_db + int(total_pecas)  # Soma de total_peças
+            novo_valor_comissao = valor_comissao_db + float(valor_comissao)  # Soma de valor_comissão
+
+            # Atualiza o banco de dados com os valores acumulados
+            comando = """UPDATE funcionários 
+                                               SET total_peças = %s, valor_comissão = %s 
+                                               WHERE nome = %s;"""
+            cursor.execute(comando, (novo_total_pecas, novo_valor_comissao, funcionario_escolhido[0][0]))
+            conexao.commit()
+            conexao.close()
+            flash('Valores adicionados com sucesso!', 'sucess')
+
+            return render_template('funcionarios_atualizar.html', funcionario=funcionario_escolhido)
+
+        else:
+            flash('Funcionário não encontrado!', 'error')
+
+    return render_template('funcionarios_atualizar.html', funcionario=funcionario)
+
+
+@app.route('/excluir_funcionario', methods=['GET', 'POST'])
+def excluir_funcionario():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+    funcionario = None
+    if request.method == 'POST':
+        nome = request.form.get('nome')
+
+        if nome:
+            cursor.execute('SELECT * FROM funcionários WHERE nome = %s;', (nome,))
+            funcionario = cursor.fetchone()
+
+            if funcionario:
+                if request.form.get('confirmar') == 'sim':
+                    print('botão pressionado')
+
+                    cursor = conexao.cursor()
+                    # Comando em SQL para deletar o cliente
+                    comando = f'DELETE FROM clientes WHERE nome = "{funcionario}"'
+                    cursor.execute(comando)
+                    print(f'excluindo cliente {funcionario}')
+
+                    conexao.commit()
+                    print(f'cliente excluido com  successo')
+                    flash(f'Funcionário {funcionario[1]} excluído com sucesso!', 'success')
+                    return render_template('excluir_funcionario.html', funcionario=None)  # Redireciona após exclusão
+
+            else:
+                flash('Cliente não encontrado!', 'error')
+
+        else:
+            flash('Por favor, informe o nome do cliente.', 'warning')  # Senão for passado
+            return redirect(url_for('excluir_funcionario'))
+
+    return render_template('excluir_funcionario.html', funcionario=funcionario)
 
 
 # Condição para verificar se o projeto esta sendo executado diretamente

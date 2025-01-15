@@ -3,42 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clientes</title>
+    <title>Menu com Botões</title>
     <style>
-       /* Resetando margens e preenchimentos */
+        /* Resetando margens e preenchimentos */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        /* Corpo da página */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             margin-bottom: 80px; /* Para evitar sobreposição com o menu */
         }
 
-
-        /* Estilo para o menu superior com botões */
+        /* Estilo do menu fixo à esquerda com botões em coluna */
         .menu {
             position: fixed;
-            top: 20px; /* Posiciona o menu mais para baixo */
+            top: 20px; /* Ajuste a posição do menu */
             left: 20px;
-            z-index: 1000; /* Certifica que o botão fique sempre sobreposto */
             display: flex;
-            flex-direction: column;  /* Organiza os botões em coluna */
-            gap: 15px;
+            flex-direction: column;
+            gap: 15px; /* Espaçamento entre os botões */
+            z-index: 1000;
         }
 
         .menu button {
             background-color: #007bff;
             color: white;
             border: none;
-            padding: 7px 7px;
-            font-size: 15px;
+            padding: 12px 20px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 8px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
@@ -48,9 +48,9 @@
             transform: scale(1.05);
         }
 
-        /* Estilo para o conteúdo da página */
+        /* Conteúdo principal */
         .main-content {
-            margin-left: 80px; /* Garante um espaço para os botões à esquerda */
+            margin-left: 100px; /* Garante que o conteúdo não seja sobreposto pelos botões */
             padding: 20px;
         }
 
@@ -88,7 +88,7 @@
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
         }
@@ -144,19 +144,19 @@
                 padding: 0 15px; /* Espaçamento nas laterais */
             }
 
-            .button-container {
+            .main-content {
+                margin-left: 20px; /* Garante que o conteúdo não seja sobreposto pelos botões */
+                padding: 15px; /* Reduz o preenchimento */
+            }
+
+            .menu {
                 top: 10px; /* Ajuste da posição para dispositivos pequenos */
                 left: 10px;
             }
 
-            .button-container form button {
-                padding: 10px 20px;  /* Menor tamanho de botão em telas pequenas */
+            .menu button {
+                padding: 10px 15px; /* Menor tamanho de botão em telas pequenas */
                 font-size: 14px;  /* Menor tamanho de texto nos botões */
-            }
-
-            .main-content {
-                margin-left: 20px; /* Garante que o conteúdo não seja sobreposto pelos botões */
-                padding: 15px; /* Reduz o preenchimento */
             }
         }
     </style>
@@ -164,10 +164,10 @@
 <body>
      <!-- Menu lateral -->
     <div class="menu">
-        <form action="/cadastro" method="GET">
             <button onclick="window.location.href='/cadastro'">Voltar para o Cadastro</button>
-        </form>
+            <button onclick="window.location.href='/editar'">Editar Cliente</button>
     </div>
+
     <!-- Conteúdo principal da página -->
     <div class="main-content">
         <h1>Buscar Cliente</h1>
