@@ -101,46 +101,49 @@ def cadastrar():
 
 # Rota para editar os clientes já cadastrados no BANCO DE DADOS
 @app.route('/editar', methods=['GET', 'POST'])
-def editar_cliente():
+def editar():
     """  Função para editar as informações de um cliente já cadastrado.
     Recebe o nome do cliente, busca os dados no banco de dados e permite ao administrador atualizar as informações."""
 
     cliente = None
     error = None
     conexao = conexao_bd()  # Chama a função para obter a conexão  com o Banco de dados
+    cursor = conexao.cursor(dictionary=True)
 
     # condição para atualizar o cliente
     if request.method == 'POST':
-        nome = request.form['nome']
+        nome_cliente = request.form.get('nome')
+        print(f"Nome do cliente enviado: {nome_cliente}")
+        print(f"Dados do formulário: {request.form}")
 
-        cursor = conexao.cursor()
-        cursor.execute(f"SELECT * FROM clientes WHERE nome = %s", (nome,))
+        if nome_cliente:
+            cursor.execute('SELECT * FROM clientes WHERE nome = %s', (nome_cliente,))
 
-        cliente = cursor.fetchone()
-        print(cliente)
+            cliente = cursor.fetchone()
+            print(cliente)
 
-        # UPDATE
-        if cliente:
-            if 'nome' in request.form:
+            # UPDATE
+            if cliente:
+                    # Pegamos os valores do formulário ou os valores atuais do cliente para fazer o UPDATE
                 nome = request.form['nome']
                 contato = request.form['contato']
                 veiculo = request.form['veiculo']
                 data_entrada = request.form['data_entrada']
                 data_saida = request.form['data_saida']
-                valor_orcamentos = request.form['valor_orcamento']
-                valor_orcamento = float(valor_orcamentos)
+                valor_orcamento = request.form['valor_orcamento']
 
-            # Comando em SQL para atualizar o cliente escolhido
+                # Comando em SQL para atualizar o cliente escolhido
                 comando = ("""UPDATE clientes set nome = %s, contato = %s, veiculo = %s, data_entrada = %s,
-                              data_saida = %s, valor_orcamento = %s WHERE nome = %s""")
-                cursor.execute(comando, (nome, contato, veiculo, data_entrada, data_saida, valor_orcamento, cliente))
+                                  data_saida = %s, valor_orcamento = %s WHERE nome = %s""")
+                cursor.execute(comando,
+                               (nome, contato, veiculo, data_entrada, data_saida, valor_orcamento, nome_cliente))
                 conexao.commit()
 
                 cursor.close()
                 conexao.close()  # Fecha a conexão com o  banco de dados
 
                 flash('Cliente atualizado com sucesso!', 'success')  # Mensagem de sucesso com flash
-                return redirect(url_for('editar_cliente'))  # Redireciona para o formulário de edição novamente
+                return redirect(url_for('editar'))  # Redireciona para o formulário de edição novamente
 
             else:
                 cursor.close()  # Fechar o cursor se o cliente não for encontrado
@@ -149,9 +152,16 @@ def editar_cliente():
 
                 flash('Cliente não encontrado!', 'error')  # Mensagem de erro com flash
 
-                return redirect(url_for('editar_cliente'))  # Redi
+    elif request.method == 'GET':
+        nome_cliente = request.args.get('nome', '')
+        if nome_cliente:
+            cursor.execute('SELECT * FROM clientes WHERE nome = %s;', (nome_cliente,))
+            cliente = cursor.fetchone()
 
-    return render_template('editar.html', cliente=None)  # Retorna a página e edição de clientes
+        cursor.close()
+        conexao.close()
+
+    return render_template('editar.html', cliente=cliente)  # Retorna a página e edição de clientes
 
 
 # Rota para excluir clientes no banco de dados
@@ -165,7 +175,7 @@ def excluir_cliente():
 
     # Condição para verificar se existe o cliente específicado no banco de dados
     if request.method == 'POST':
-        nome_cliente = request.form.get('nome')
+        nome_cliente = request.form['nome']
         print(f"Nome do cliente enviado: {nome_cliente}")
         print(f"Dados do formulário: {request.form}")
 
@@ -342,8 +352,7 @@ def excluir_funcionario():
 
                     cursor = conexao.cursor()
                     # Comando em SQL para deletar o cliente
-                    comando = f'DELETE FROM clientes WHERE nome = "{funcionario}"'
-                    cursor.execute(comando)
+                    cursor.execute(f'DELETE FROM clientes WHERE nome = "{funcionario}";')
                     print(f'excluindo cliente {funcionario}')
 
                     conexao.commit()
@@ -359,6 +368,15 @@ def excluir_funcionario():
             return redirect(url_for('excluir_funcionario'))
 
     return render_template('excluir_funcionario.html', funcionario=funcionario)
+
+
+@app.route('/relatorio_orcamentos', methods=['GET','POST'])
+def relatorio_orcamentos():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+    if request.method == 'POST':
+        data_inico = request.form['data_entrada']
+
 
 
 # Condição para verificar se o projeto esta sendo executado diretamente
