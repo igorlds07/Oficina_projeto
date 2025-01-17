@@ -6,7 +6,6 @@
     <title>Login - Oficina Automotiva</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- CSS Interno -->
     <style>
         /* Estilo geral para o corpo */
         body {
@@ -75,7 +74,6 @@
             cursor: pointer;
             width: 100%;
             border-radius: 5px;
-            transition: background-color 0.3s ease;
         }
 
         .btn-primary:hover {
@@ -88,26 +86,6 @@
             font-size: 14px;
             margin-top: 10px;
         }
-
-        /* Responsividade */
-        @media (max-width: 576px) {
-            .container {
-                padding: 20px;
-                max-width: 90%;
-            }
-
-            header h1 {
-                font-size: 28px;
-            }
-
-            .form-control {
-                font-size: 14px;
-            }
-
-            .btn-primary {
-                font-size: 16px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -117,6 +95,17 @@
         </header>
 
         <section>
+            <!-- Exibindo a mensagem de sucesso ou erro -->
+            {% if mensagem %}
+                <div class="alert alert-success text-center">
+                    {{ mensagem }}
+                </div>
+            {% endif %}
+
+            {% if error %}
+                <div class="alert alert-danger text-center">{{ error }}</div>
+            {% endif %}
+
             <!-- Formulário de login -->
             <form action="{{ url_for('login_user') }}" method="POST">
                 <div class="form-group">
@@ -127,10 +116,6 @@
                 <div class="form-group">
                     <label for="senha">Senha:</label>
                     <input type="password" class="form-control" id="senha" name="senha" required>
-                    <!-- Exibindo a mensagem de erro, se houver -->
-                    {% if error %}
-                        <div class="error-message">{{ error }}</div>
-                    {% endif %}
                 </div>
 
                 <!-- Botão de envio do formulário -->

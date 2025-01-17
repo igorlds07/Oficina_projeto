@@ -37,8 +37,9 @@
             background-color: #007bff; /* Azul */
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 25px;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
             border-radius: 5px;
             transition: background-color 0.3s ease;
@@ -53,18 +54,19 @@
         .container {
             background-color: #fff;
             padding: 30px;
+            margin-top: -70px; /* Move o contêiner para cima */
             border-radius: 8px;
-            width: 100%;
-            max-width: 500px;
+            width: 900%;
+            max-width: 700px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
-            margin-left: 240px; /* Para não sobrepor o menu */
+            margin-left: 450px; /* Para não sobrepor o menu */
         }
 
         /* Título da página */
         h1 {
             color: #333;
-            font-size: 24px;
+            font-size: 25px;
         }
 
         /* Estilo para as mensagens de sucesso ou erro */
@@ -87,6 +89,45 @@
         .alert-error {
             background-color: #dc3545;
             color: white;
+        }
+        /* Animação de entrada das mensagens */
+        @keyframes slideIn {
+          0% {
+        opacity: 0;
+        top: -50px;
+        }
+        100% {
+        opacity: 1;
+        top: 20px;
+            }
+        }
+
+        /* Fechar mensagem após um tempo */
+        .messages .alert {
+            animation: fadeOut 6s forwards; /* A mensagem desaparece após 4 segundos */
+        }
+
+        @keyframes fadeOut {
+        0% {
+        opacity: 1;
+        }
+        100% {
+        opacity: 0;
+        visibility: hidden;
+        top: -50px;
+        }
+        }
+
+        /* Animação de fade-in */
+         @keyframes fadeIn {
+         0% {
+         opacity: 0;
+         visibility: hidden;
+         }
+         100% {
+         opacity: 1;
+         visibility: visible;
+            }
         }
 
         /* Formulário */
@@ -126,17 +167,27 @@
     </style>
 </head>
 <body>
+<div class="menu">
+        <label>
+            <button>Clientes</button>
+            <div class="submenu">
+                <a href="/cadastro">Cadastrar Cliente</a>
+                <a href="/editar">Editar Cliente</a>
+                <a href="/excluir_cliente">Excluir Cliente</a>
+                <a href="/clientes">Visualizar Clientes</a>
+            </div>
+        </label>
+        <label>
+            <button>Funcionários</button>
+            <div class="submenu">
+                <a href="/funcionarios">Cadastrar Funcionário</a>
+                <a href="/editar_funcionario">Editar Funcionário</a>
+                <a href="/excluir_funcionario">Excluir Funcionário</a>
+                <a href="/funcionarios">Visualizar Funcionários</a>
+            </div>
+        </label>
 
-    <!-- Menu Superior no Canto Esquerdo -->
-    <div class="menu">
-        <form action="/cadastro" method="GET">
-            <button type="submit">Voltar para o Cadastro</button>
-        </form>
-        <form action="/editar" method="GET">
-            <button type="submit">Editar Cliente</button>
-        </form>
-    </div>
-
+    {% include 'menu.html' %}
       <!-- Contêiner de Exclusão -->
     <div class="container">
         <h1>Excluir Cliente</h1>
