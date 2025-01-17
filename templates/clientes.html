@@ -100,6 +100,7 @@
         table {
             width: 80%;
             margin: 30px auto;
+            margin-right: 50px; /* Adiciona espaço à esquerda */
             border-collapse: collapse;
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -162,12 +163,33 @@
     </style>
 </head>
 <body>
-     <!-- Menu lateral -->
-    <div class="menu">
-            <button onclick="window.location.href='/cadastro'">Voltar para o Cadastro</button>
-            <button onclick="window.location.href='/editar'">Editar Cliente</button>
-    </div>
+  <div class="menu">
+    <label>
+        <button>Clientes</button>
+        <input type="checkbox">
+        <div class="submenu">
+            <a href="/cadastro">Cadastrar Cliente</a>
+            <a href="/editar_cliente">Editar Cliente</a>
+            <a href="/excluir_cliente">Excluir Cliente</a>
+            <a href="/clientes">Visualizar Clientes</a>
+        </div>
 
+    </label>
+    <label>
+        <button>Funcionários</button>
+        <input type="checkbox">
+        <div class="submenu">
+            <a href="/cadastro_funcionario">Cadastrar Funcionário</a>
+            <a href="/editar_funcionario">Editar Funcionário</a>
+            <a href="/excluir_funcionario">Excluir Funcionário</a>
+            <a href="/funcionarios">Visualizar Funcionários</a>
+        </div>
+
+
+    </label>
+</div>
+   <!-- Inclui o menu fixo -->
+    {% include 'menu.html' %}
     <!-- Conteúdo principal da página -->
     <div class="main-content">
         <h1>Buscar Cliente</h1>

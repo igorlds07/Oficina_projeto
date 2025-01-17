@@ -216,12 +216,29 @@
 <body>
 
 <!-- Menu Fixado à Esquerda -->
-<div class="menu">
-    <button onclick="window.location.href='/funcionarios/atualizar'">Atualizar Comissão</button>
-    <button onclick="window.location.href='/funcionarios'">Funcionários</button>
-    <button onclick="window.location.href='/cadastro'">Cadastro de Clientes</button>
+   <div class="menu">
+    <label>
+        <button>Clientes</button>
+        <input type="checkbox">
+        <div class="submenu">
+            <a href="/cadastro_cliente">Cadastrar Cliente</a>
+            <a href="/editar_cliente">Editar Cliente</a>
+            <a href="/excluir_cliente">Excluir Cliente</a>
+            <a href="/clientes">Visualizar Clientes</a>
+        </div>
+    </label>
+    <label>
+        <button>Funcionários</button>
+        <input type="checkbox">
+        <div class="submenu">
+            <a href="/funcionarios">Cadastrar Funcionário</a>
+            <a href="/editar_funcionario">Editar Funcionário</a>
+            <a href="/excluir_funcionario">Excluir Funcionário</a>
+            <a href="/funcionarios">Visualizar Funcionários</a>
+        </div>
+    </label>
 </div>
-
+{% include 'menu.html' %}
       <!-- Contêiner de Exclusão -->
     <div class="container">
         <h1>Excluir Funcionário</h1>
@@ -242,7 +259,7 @@
         <!-- Exibe o Formulário de Exclusão (Somente no GET) -->
         <form method="POST" action="{{ url_for('excluir_funcionario') }}">
             <div class="form-group">
-                <label for="nome">Nome do Cliente:</label>
+                <label for="nome">Nome do Funcionário:</label>
                 <input type="text" id="nome" name="nome" value="{{ funcionario[1] if funcionario else '' }}" required>
             </div>
 

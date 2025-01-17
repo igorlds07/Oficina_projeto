@@ -101,67 +101,59 @@ def cadastrar():
 
 # Rota para editar os clientes já cadastrados no BANCO DE DADOS
 @app.route('/editar', methods=['GET', 'POST'])
-def editar():
+def editar_cliente():
     """  Função para editar as informações de um cliente já cadastrado.
     Recebe o nome do cliente, busca os dados no banco de dados e permite ao administrador atualizar as informações."""
 
     cliente = None
-    error = None
+    error = []
     conexao = conexao_bd()  # Chama a função para obter a conexão  com o Banco de dados
-    cursor = conexao.cursor(dictionary=True)
 
     # condição para atualizar o cliente
     if request.method == 'POST':
-        nome_cliente = request.form.get('nome')
-        print(f"Nome do cliente enviado: {nome_cliente}")
-        print(f"Dados do formulário: {request.form}")
+        cliente = request.form['cliente']
+        nome = request.form['nome']
+        contato = request.form['contato']
+        veiculo = request.form['veiculo']
+        data_entrada = request.form['data_entrada']
+        data_saida = request.form['data_saida']
+        valor_orcamentos = request.form['valor_orcamento']
+        valor_orcamento = float(valor_orcamentos)
 
-        if nome_cliente:
-            cursor.execute('SELECT * FROM clientes WHERE nome = %s', (nome_cliente,))
+        # Condição para verificar se houve conexão com o banco de dados
+        if conexao is None:
+            return render_template('editar.html', error=['Erro na conexão com o banco de dados.'])
 
-            cliente = cursor.fetchone()
-            print(cliente)
+        cursor = conexao.cursor()
+        cursor.execute("SELECT * FROM clientes WHERE nome = %s", (cliente,))
 
-            # UPDATE
-            if cliente:
-                    # Pegamos os valores do formulário ou os valores atuais do cliente para fazer o UPDATE
-                nome = request.form['nome']
-                contato = request.form['contato']
-                veiculo = request.form['veiculo']
-                data_entrada = request.form['data_entrada']
-                data_saida = request.form['data_saida']
-                valor_orcamento = request.form['valor_orcamento']
+        cliente_existente = cursor.fetchone()
+        print(cliente_existente)
+        # UPDATE
+        if cliente_existente:
 
-                # Comando em SQL para atualizar o cliente escolhido
-                comando = ("""UPDATE clientes set nome = %s, contato = %s, veiculo = %s, data_entrada = %s,
-                                  data_saida = %s, valor_orcamento = %s WHERE nome = %s""")
-                cursor.execute(comando,
-                               (nome, contato, veiculo, data_entrada, data_saida, valor_orcamento, nome_cliente))
-                conexao.commit()
+            # Comando em SQL para atualizar o cliente escolhido
+            cursor.execute("""UPDATE clientes SET nome = %s, contato = %s, veiculo = %s, data_entrada = %s,
+                          data_saida = %s, valor_orcamento = %s WHERE nome = %s""",
+                           (nome, contato, veiculo, data_entrada, data_saida, valor_orcamento, cliente))
+            conexao.commit()
 
-                cursor.close()
-                conexao.close()  # Fecha a conexão com o  banco de dados
+            cursor.close()
+            conexao.close()  # Fecha a conexão com o  banco de dados
 
-                flash('Cliente atualizado com sucesso!', 'success')  # Mensagem de sucesso com flash
-                return redirect(url_for('editar'))  # Redireciona para o formulário de edição novamente
+            flash('Cliente atualizado com sucesso!', 'success')  # Mensagem de sucesso com flash
+            return redirect(url_for('editar_cliente'))  # Redireciona para o formulário de edição novamente
 
-            else:
-                cursor.close()  # Fechar o cursor se o cliente não for encontrado
+        else:
+            cursor.close()  # Fechar o cursor se o cliente não for encontrado
 
-                conexao.close()  # Fechar a conexão
+            conexao.close()  # Fechar a conexão
 
-                flash('Cliente não encontrado!', 'error')  # Mensagem de erro com flash
+            flash('Cliente não encontrado!', 'error')  # Mensagem de erro com flash
 
-    elif request.method == 'GET':
-        nome_cliente = request.args.get('nome', '')
-        if nome_cliente:
-            cursor.execute('SELECT * FROM clientes WHERE nome = %s;', (nome_cliente,))
-            cliente = cursor.fetchone()
+            return redirect(url_for('editar_cliente'))  # Redi
 
-        cursor.close()
-        conexao.close()
-
-    return render_template('editar.html', cliente=cliente)  # Retorna a página e edição de clientes
+    return render_template('editar.html', cliente=None)  # Retorna a página e edição de clientes
 
 
 # Rota para excluir clientes no banco de dados
@@ -264,13 +256,16 @@ def clientes():
 def funcionarios():
     conexao = conexao_bd()
     cursor = conexao.cursor()
-    funcionario_cadastrado = ()
+
+    funcionario = []
+
     if request.method == 'GET' and 'ver_todos' in request.args:
         comando = 'SELECT * FROM funcionários;'
         cursor.execute(comando,)
-        funcionario_cadastrado = cursor.fetchall()
-        print(funcionario_cadastrado)
-        return render_template('funcionarios.html', funcionarios=funcionario_cadastrado)
+        funcionario = cursor.fetchall()
+        print(funcionario)
+
+        return render_template('funcionarios.html', funcionarios=funcionario)
 
     if request.method == 'POST':
         nome = request.form['nome']
@@ -281,7 +276,7 @@ def funcionarios():
         comando = "INSERT INTO funcionários (nome, contato, cargo) VALUES (%s, %s, %s);"
         cursor.execute(comando, (nome, contato, cargo))
         conexao.commit()
-        flash('Funcionário cadastrado com sucesso !', 'sucess')
+        flash('Funcionário cadastrado com sucesso !', 'success')
         funcionarios_cadastrados = cursor.fetchall()
 
         return render_template('funcionarios.html', funcionarios=funcionarios_cadastrados)
@@ -361,7 +356,7 @@ def excluir_funcionario():
                     return render_template('excluir_funcionario.html', funcionario=None)  # Redireciona após exclusão
 
             else:
-                flash('Cliente não encontrado!', 'error')
+                flash('Funcionário não encontrado!', 'error')
 
         else:
             flash('Por favor, informe o nome do cliente.', 'warning')  # Senão for passado
@@ -370,13 +365,49 @@ def excluir_funcionario():
     return render_template('excluir_funcionario.html', funcionario=funcionario)
 
 
-@app.route('/relatorio_orcamentos', methods=['GET','POST'])
+@app.route('/editar_funcionario', methods=['GET', 'POST'])
+def editar_funcionario():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+    funcionario = None
+    error = None
+
+    if request.method == 'POST':
+        funcionaro_nome = request.form['nome_funcionario']
+        nome = request.form['nome']
+        contato = request.form['contato']
+        cargo = request.form['cargo']
+
+        cursor.execute('SELECT * FROM funcionários WHERE nome = %s;', (funcionaro_nome,))
+        funcionario = cursor.fetchone()
+        print(funcionario)
+
+        if funcionario:
+            cursor.execute("""UPDATE funcionários SET nome = %s, contato = %s, cargo = %s, WHERE nome = %s""",
+                           (nome, contato, cargo, funcionario))
+            conexao.commit()
+
+            cursor.close()
+            conexao.close()  # Fecha a conexão com o  banco de dados
+
+            flash('Funcionário atualizado com sucesso!', 'success')  # Mensagem de sucesso com flash
+            return redirect(url_for('editar_funcionario'))  # Redireciona para o formulário de edição novamente
+
+        else:
+            flash('Funcionário não encontrado !', 'error')
+            conexao.close()
+            cursor.close()
+            return redirect(url_for('editar_funcionario'))
+
+    return render_template('editar_funcionario.html', funcionario=None)
+
+
+'''@app.route('/relatorio_orcamentos', methods=['GET', 'POST'])
 def relatorio_orcamentos():
     conexao = conexao_bd()
     cursor = conexao.cursor()
     if request.method == 'POST':
-        data_inico = request.form['data_entrada']
-
+        data_inico = request.form['data_entrada']'''
 
 
 # Condição para verificar se o projeto esta sendo executado diretamente

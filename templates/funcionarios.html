@@ -1,9 +1,9 @@
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Funcionários</title>
-
     <style>
         /* Resetando o estilo padrão do navegador */
         * {
@@ -22,20 +22,21 @@
         /* Cabeçalho */
         h1 {
             text-align: center;
-            background-color: #ffffff; /* Fundo neutro */
-            color: #333; /* Cor do texto */
+            background-color: #ffffff;
+            color: #333;
             padding: 20px;
             margin-bottom: 20px;
-            border-bottom: 2px solid #ddd; /* Linha inferior para separar o conteúdo */
+            border-bottom: 2px solid #ddd;
         }
 
         /* Container principal */
         .container {
             max-width: 895px;
             margin: 0 auto;
+            margin-right: 150px;
             padding: 20px;
             background-color: white;
-            border-radius: 8px;
+            border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -143,24 +144,6 @@
             margin-bottom: 10px;
         }
 
-        #funcionarios-lista ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        #funcionarios-lista li {
-            background-color: #f9f9f9;
-            margin: 8px 0;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-
-        #funcionarios-lista li:hover {
-            background-color: #e8e8e8;
-        }
-
-        /* Estilo para a mensagem de sucesso */
         .alert {
             padding: 10px;
             margin-bottom: 20px;
@@ -168,37 +151,44 @@
             font-size: 16px;
         }
 
-        /* Estilo para a mensagem de sucesso */
         .alert-success {
-            background-color: #28a745 !important; /* Verde claro */
+            background-color: #28a745 !important;
             color: white !important;
-            border: 1px solid #218838 !important; /* Tom mais escuro de verde */
+            border: 1px solid #218838 !important;
         }
 
-        /* Estilo para a mensagem de erro (caso queira usar futuramente) */
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
         }
-
     </style>
 </head>
 <body>
-    <!-- Menu fixo à esquerda com botões -->
     <div class="menu">
-        <!-- Botão que redireciona para a página de cadastro -->
-        <button onclick="window.location.href='/cadastro'">Voltar para o Cadastro</button>
-
-        <!-- Botão que redireciona para a página de edição -->
-        <button onclick="window.location.href='/funcionarios_atualizar'">Atualizar comissão</button>
-
-        <!-- Botão que redireciona para a página de exclusão -->
-        <button onclick="window.location.href='/excluir_funcionario'">Excluir Funcionário</button>
+        <label>
+            <button>Clientes</button>
+            <div class="submenu">
+                <a href="/cadastro_cliente">Cadastrar Cliente</a>
+                <a href="/editar_cliente">Editar Cliente</a>
+                <a href="/excluir_cliente">Excluir Cliente</a>
+                <a href="/clientes">Visualizar Clientes</a>
+            </div>
+        </label>
+        <label>
+            <button>Funcionários</button>
+            <div class="submenu">
+                <a href="/cadastro_funcionario">Cadastrar Funcionário</a>
+                <a href="/editar_funcionario">Editar Funcionário</a>
+                <a href="/excluir_funcionario">Excluir Funcionário</a>
+                <a href="/funcionarios">Visualizar Funcionários</a>
+            </div>
+        </label>
     </div>
-
-    <h1>Cadastro de Funcionários</h1>
+    {% include 'menu.html' %}
     <div class="container">
-        <!-- Exibe mensagens de flash, como a de sucesso -->
+        <h1>Cadastro de Funcionários</h1>
+
+        <!-- Exibe mensagens de flash -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
@@ -209,14 +199,14 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Formulário de cadastro de funcionário -->
+        <!-- Formulário de cadastro -->
         <h2>Cadastrar Novo Funcionário</h2>
         <form method="POST">
+
             <div class="form-group">
                 <label for="nome">Nome:</label>
                 <input type="text" id="nome" name="nome" placeholder="Digite o nome do funcionário" required>
             </div>
-
 
             <div class="form-group">
                 <label for="contato">Contato:</label>
@@ -227,18 +217,14 @@
                 <label for="cargo">Cargo:</label>
                 <input type="text" id="cargo" name="cargo" placeholder="Digite o cargo do funcionário" required>
             </div>
-
             <button type="submit">Cadastrar</button>
         </form>
-
-        <hr>
-
-        <!-- Formulário para ver todos os funcionários -->
         <form action="/funcionarios" method="GET">
             <button type="submit" name="ver_todos" value="true">Ver Todos os Funcionários</button>
         </form>
+        <hr>
 
-        <!-- Lista de funcionários cadastrados -->
+        <!-- Lista de funcionários -->
         <section id="funcionarios-lista">
             <h2>Funcionários Cadastrados</h2>
             <table>
@@ -249,7 +235,7 @@
                         <th>Contato</th>
                         <th>Cargo</th>
                         <th>Peças</th>
-                        <th>Valor comissão</th>
+                        <th>Valor Comissão</th>
                     </tr>
                 </thead>
                 <tbody>

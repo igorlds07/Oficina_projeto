@@ -54,18 +54,19 @@
         .container {
             background-color: #fff;
             padding: 30px;
+            margin-top: -70px; /* Move o contêiner para cima */
             border-radius: 8px;
-            width: 100%;
-            max-width: 500px;
+            width: 900%;
+            max-width: 700px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
-            margin-left: 240px; /* Para não sobrepor o menu */
+            margin-left: 450px; /* Para não sobrepor o menu */
         }
 
         /* Título da página */
         h1 {
             color: #333;
-            font-size: 24px;
+            font-size: 25px;
         }
 
         /* Estilo para as mensagens de sucesso ou erro */
@@ -166,20 +167,27 @@
     </style>
 </head>
 <body>
+<div class="menu">
+        <label>
+            <button>Clientes</button>
+            <div class="submenu">
+                <a href="/cadastro">Cadastrar Cliente</a>
+                <a href="/editar">Editar Cliente</a>
+                <a href="/excluir_cliente">Excluir Cliente</a>
+                <a href="/clientes">Visualizar Clientes</a>
+            </div>
+        </label>
+        <label>
+            <button>Funcionários</button>
+            <div class="submenu">
+                <a href="/funcionarios">Cadastrar Funcionário</a>
+                <a href="/editar_funcionario">Editar Funcionário</a>
+                <a href="/excluir_funcionario">Excluir Funcionário</a>
+                <a href="/funcionarios">Visualizar Funcionários</a>
+            </div>
+        </label>
 
-    <!-- Menu Superior no Canto Esquerdo -->
-    <div class="menu">
-        <form action="/cadastro" method="GET">
-            <button type="submit">Voltar para o Cadastro</button>
-        </form>
-        <form action="/editar" method="GET">
-            <button type="submit">Editar Cliente</button>
-        </form>
-        <form action="/clientes" method="GET">
-            <button type="submit">Clientes</button>
-        </form>
-    </div>
-
+    {% include 'menu.html' %}
       <!-- Contêiner de Exclusão -->
     <div class="container">
         <h1>Excluir Cliente</h1>
