@@ -2,6 +2,8 @@ import os
 
 from flask import Flask, render_template, request, redirect, url_for, flash
 
+from datetime import datetime
+
 from BD import conexao_bd
 
 # Nome da aplicação
@@ -402,12 +404,44 @@ def editar_funcionario():
     return render_template('editar_funcionario.html', funcionario=None)
 
 
-'''@app.route('/relatorio_orcamentos', methods=['GET', 'POST'])
+@app.route('/relatorio_orcamentos', methods=['GET', 'POST'])
 def relatorio_orcamentos():
     conexao = conexao_bd()
     cursor = conexao.cursor()
+    resultados = None
+
     if request.method == 'POST':
-        data_inico = request.form['data_entrada']'''
+        data_inicio = request.form['data_entrada']
+        data_fim = request.form['data_saida']
+
+        if data_inicio and data_fim:
+            data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
+            data_fim = datetime.strptime(data_fim, '%Y-%m-%d')
+
+            if data_inicio > data_fim:
+                flash('A data de inicío não pode ser maior que a data de fim!', 'error')
+                return render_template(
+                    'relatorio_orcamentos.html',)
+
+        # Consulta SQL para buscar orçamentos no período
+        query = """
+            SELECT idclientes, nome, contato, veiculo, data_entrada, data_saida, valor_orcamento
+            FROM clientes
+            WHERE data_entrada BETWEEN %s AND %s
+        """
+        cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
+        resultados = cursor.fetchall()
+        total = 0
+        for cliente in resultados:
+            total += 1
+        message = f'Foram realizados {total} orçamentos !'
+
+        conexao.close()
+        cursor.close()
+
+        return render_template('relatorio_orcamentos.html', resultados=resultados, message=message)
+
+    return render_template('relatorio_orcamentos.html', resultados=resultados)
 
 
 # Condição para verificar se o projeto esta sendo executado diretamente

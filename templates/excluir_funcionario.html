@@ -172,21 +172,9 @@
             h1 {
                 font-size: 24px;
             }
-            /* Animação de entrada das mensagens */
-        @keyframes slideIn {
-          0% {
-        opacity: 0;
-        top: -50px;
-        }
-        100% {
-        opacity: 1;
-        top: 20px;
-            }
-        }
-
-        /* Fechar mensagem após um tempo */
+          /* Fechar mensagem após um tempo */
         .messages .alert {
-            animation: fadeOut 5s forwards; /* A mensagem desaparece após 4 segundos */
+            animation: fadeOut 6s forwards; /* A mensagem desaparece após 4 segundos */
         }
 
         @keyframes fadeOut {
@@ -237,6 +225,11 @@
             <a href="/funcionarios">Visualizar Funcionários</a>
         </div>
     </label>
+        <label>
+        <div class="submenu">
+            <a href="/relatorio_orcamentos">Relatórios Orçamentos</a>
+        </div>
+        </label>
 </div>
 {% include 'menu.html' %}
       <!-- Contêiner de Exclusão -->
