@@ -63,6 +63,7 @@ def login_user():
 def index():
     """ Função que renderiza a página de cadastro de clientes.
     Exibe um formulário onde o usuário pode preencher as informações de um novo cliente."""
+
     return render_template('index.html')
 
 
@@ -91,12 +92,12 @@ def cadastrar():
         cursor.close()
         conexao.close()
 
-        flash('Cadastrado com sucesso!', 'sucess')
+        message = 'Cadastrado com sucesso!'
         sucess_mesagge = 'Cadastrado com sucesso'
         print(sucess_mesagge)
 
         # Ao clicar o botão cadastrar e emetido a mensagem de 'sucesso' e  retorna a  página de cadastro
-        return render_template('index.html', )
+        return render_template('index.html', message=message)
 
     return render_template('index.html')  # Ao finalizar o processo retorna a página de cadastro novamente
 
@@ -442,6 +443,51 @@ def relatorio_orcamentos():
         return render_template('relatorio_orcamentos.html', resultados=resultados, message=message)
 
     return render_template('relatorio_orcamentos.html', resultados=resultados)
+
+
+@app.route('/relatorio_despesas', methods=['GET', 'POST'])
+def relatorio_despesas():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+
+    despesas = None
+
+    if request.method == 'POST':
+        data_inicio = request.form['data']
+        data_fim = request.form['data']
+
+        if data_fim < data_inicio:
+            flash('A data do fim não pode ser menor que a data de inicío!', 'error')
+            return render_template('relattorio_depsesas')
+
+
+
+@app.route('/despesas', methods=['GET', 'POST'])
+def despesas():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+
+    despesa = None
+
+    if request.method == 'POST':
+        descricao = request.form['descrição']
+        data = request.form['data']
+        valor = request.form['valor']
+
+        cursor.execute('INSERT INTO despesas(descrição, data, valor)'
+                       'VALUES(%s, %s,%s);', (descricao, data, valor))
+
+        conexao.commit()
+        conexao.close()
+        cursor.close()
+        print(f'Despesas foram inseridas {descricao} , {data}, {valor} ')
+        flash('Despesas acrescentadas com sucesso!', 'sucess')
+
+        return render_template('despesas.html')
+
+    return render_template('despesas.html')
+
+
 
 
 # Condição para verificar se o projeto esta sendo executado diretamente
