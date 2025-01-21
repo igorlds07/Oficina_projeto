@@ -52,7 +52,6 @@ def login_user():
         mensagem = 'Acesso liberado'
 
         if mensagem:
-
             return redirect(url_for('index'))
 
     return render_template('login.html', mensagem=mensagem)
@@ -227,7 +226,6 @@ def clientes():
 
         nome = request.form['nome']
         if nome:
-
             # READ
             # Comando em SQL para buscar o cliente específicado
             comando = 'SELECT  * FROM clientes WHERE nome = %s;'
@@ -242,7 +240,6 @@ def clientes():
 
     # Condição para vereificar se o usuário deseja ver todos os clientes
     if request.method == 'GET' and 'ver_todos' in request.args:
-
         # Comando em SQL para buscar todos os clientes
         comando = 'SELECT * FROM clientes;'
         cursor.execute(comando)
@@ -264,7 +261,7 @@ def funcionarios():
 
     if request.method == 'GET' and 'ver_todos' in request.args:
         comando = 'SELECT * FROM funcionários;'
-        cursor.execute(comando,)
+        cursor.execute(comando, )
         funcionario = cursor.fetchall()
         print(funcionario)
 
@@ -422,7 +419,7 @@ def relatorio_orcamentos():
             if data_inicio > data_fim:
                 flash('A data de inicío não pode ser maior que a data de fim!', 'error')
                 return render_template(
-                    'relatorio_orcamentos.html',)
+                    'relatorio_orcamentos.html', )
 
         # Consulta SQL para buscar orçamentos no período
         query = """
@@ -435,6 +432,7 @@ def relatorio_orcamentos():
         total = 0
         for cliente in resultados:
             total += 1
+
         message = f'Foram realizados {total} orçamentos !'
 
         conexao.close()
@@ -449,25 +447,43 @@ def relatorio_orcamentos():
 def relatorio_despesas():
     conexao = conexao_bd()
     cursor = conexao.cursor()
-
-    despesas = None
+    resultado = None
+    despesa = []
+    total_despesas = 0
 
     if request.method == 'POST':
-        data_inicio = request.form['data']
-        data_fim = request.form['data']
+        data_inicio = request.form.get('data_inicio')
+        data_fim = request.form.get('data_fim')
 
-        if data_fim < data_inicio:
-            flash('A data do fim não pode ser menor que a data de inicío!', 'error')
-            return render_template('relattorio_depsesas')
+        if data_inicio and data_fim:
+                data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
+                data_fim = datetime.strptime(data_fim, '%Y-%m-%d')
 
+                if data_fim < data_inicio:
+                    flash('A data do fim não pode ser menor que a data de inicío!', 'error')
+                    return render_template('relatorio_despesas')
+
+        query = """
+                    SELECT iddespesas, descrição, data, valor
+                    FROM despesas
+                    WHERE data BETWEEN %s AND %s
+                """
+        cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
+
+        resultado = cursor.fetchall()
+        print(resultado)
+
+        total_despesas = sum(despesa[3] for despesa in resultado)  # Despesa[3] é o valor
+
+        return render_template('relatorio_despesas.html', despesas=resultado, total_despesas=total_despesas)
+
+    return render_template('relatorio_despesas.html', despesa=despesa, total_despesas=total_despesas)
 
 
 @app.route('/despesas', methods=['GET', 'POST'])
 def despesas():
     conexao = conexao_bd()
     cursor = conexao.cursor()
-
-    despesa = None
 
     if request.method == 'POST':
         descricao = request.form['descrição']
@@ -486,8 +502,6 @@ def despesas():
         return render_template('despesas.html')
 
     return render_template('despesas.html')
-
-
 
 
 # Condição para verificar se o projeto esta sendo executado diretamente
