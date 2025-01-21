@@ -26,7 +26,7 @@
             color: #333;
             padding: 20px;
             margin-bottom: 20px;
-            border-bottom: 2px solid #ddd;
+            border-bottom: 2px solid #007BFF;
         }
 
         /* Container principal */
@@ -164,26 +164,7 @@
     </style>
 </head>
 <body>
-    <div class="menu">
-        <label>
-            <button>Clientes</button>
-            <div class="submenu">
-                <a href="/cadastro_cliente">Cadastrar Cliente</a>
-                <a href="/editar_cliente">Editar Cliente</a>
-                <a href="/excluir_cliente">Excluir Cliente</a>
-                <a href="/clientes">Visualizar Clientes</a>
-            </div>
-        </label>
-        <label>
-            <button>Funcionários</button>
-            <div class="submenu">
-                <a href="/cadastro_funcionario">Cadastrar Funcionário</a>
-                <a href="/editar_funcionario">Editar Funcionário</a>
-                <a href="/excluir_funcionario">Excluir Funcionário</a>
-                <a href="/funcionarios">Visualizar Funcionários</a>
-            </div>
-        </label>
-    </div>
+
     {% include 'menu.html' %}
     <div class="container">
         <h1>Cadastro de Funcionários</h1>

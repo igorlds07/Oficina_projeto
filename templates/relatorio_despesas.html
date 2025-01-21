@@ -175,30 +175,36 @@
             color: #004085; /* Cor do texto azul escuro */
             border: 1px solid #b8daff; /* Borda azul claro */
         }
+         .flash-messages {
+            list-style: none;
+            padding: 0;
+        }
+        .flash-messages .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+             animation: fadeOut 6s forwards; /* A mensagem desaparece após 4 segundos */
+        }
+
+
+        @keyframes fadeOut {
+        0% {
+        opacity: 1;
+        }
+        100% {
+        opacity: 0;
+        visibility: hidden;
+        top: -50px;
+        }
+        }
+
     </style>
 </head>
 <body>
-    <!-- Menu Lateral -->
-    <div class="menu">
-        <label>
-            <button>Clientes</button>
-            <input type="checkbox">
-        </label>
-        <div class="submenu">
-            <a href="/cadastro">Cadastrar Cliente</a>
-            <a href="/editar">Editar Cliente</a>
-            <a href="/excluir_cliente">Excluir Cliente</a>
-            <a href="/clientes">Visualizar Clientes</a>
-        </div>
-        <label>
-            <button>Relatórios</button>
-            <input type="checkbox">
-        </label>
-        <div class="submenu">
-            <a href="/relatorio_orcamentos">Relatório Orçamentos</a>
-            <a href="/relatorio_despesas">Relatório Despesas</a>
-        </div>
-    </div>
+
     {% include 'menu.html' %}
     <div class="container">
         <header>
@@ -242,23 +248,22 @@
                     <tr>
                         <th>ID</th>
                         <th>Descrição</th>
+                        <th>Data</th>
                         <th>Valor</th>
-                        <th>Data de Entrada</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for despesa in despesa %}
+                    {% for despesa in despesas %}
                         <tr>
                             <td>{{ despesa[0] }}</td>  <!-- ID -->
                             <td>{{ despesa[1] }}</td>  <!-- Descrição -->
-                            <td>R$ {{ despesa[2] | round(2) }}</td>  <!-- Valor -->
-                            <td>{{ despesa[3] }}</td>  <!-- Data de Entrada -->
+                            <td>{{ despesa[2] }}</td>  <!-- Valor -->
+                            <td>R$ {{ despesa[3] }}</td>  <!-- Data de Entrada -->
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        {% else %}
-            <p>Nenhuma despesa encontrada para o período selecionado.</p>
+
         {% endif %}
     </div>
 </body>

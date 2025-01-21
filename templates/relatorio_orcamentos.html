@@ -161,6 +161,7 @@ form button:hover {
 .flash-messages .error {
     background-color: #f8d7da;
     color: #842029;
+     animation: fadeOut 6s forwards; /* Aplica an animação ao erro */
 }
 
 .flash-messages .info {
@@ -172,6 +173,15 @@ form button:hover {
     background-color: #d4edda;
     color: #155724;
 }
+@keyframes fadeOut {
+        0% {
+        opacity: 1;
+        }
+        100% {
+        opacity: 0;
+        visibility: hidden;
+        top: -50px;
+        }
 
 /* Tabela */
 table {
@@ -236,6 +246,7 @@ table th {
     background-color: #cce5ff; /* Fundo azul claro */
     color: #004085; /* Cor do texto azul escuro */
     border: 1px solid #b8daff; /* Borda azul claro */
+
 }
 
       }
@@ -369,7 +380,7 @@ table th {
                             <td>{{ resultado[3] }}</td>
                             <td>{{ resultado[4] }}</td>
                             <td>{{ resultado[5] }}</td>
-                            <td>{{ resultado[6] }}</td>
+                            <td>R${{ resultado[6] }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

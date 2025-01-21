@@ -347,7 +347,7 @@ def excluir_funcionario():
 
                     cursor = conexao.cursor()
                     # Comando em SQL para deletar o cliente
-                    cursor.execute(f'DELETE FROM clientes WHERE nome = "{funcionario}";')
+                    cursor.execute(f'DELETE FROM funcionários WHERE nome = "{funcionario}";')
                     print(f'excluindo cliente {funcionario}')
 
                     conexao.commit()
@@ -429,6 +429,11 @@ def relatorio_orcamentos():
         """
         cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
         resultados = cursor.fetchall()
+
+        if not resultados:
+            flash('Não foi encontrado nenhum orçamento dentro do período!', 'error')
+            return render_template('relatorio_orcamentos.html')
+
         total = 0
         for cliente in resultados:
             total += 1
@@ -456,12 +461,12 @@ def relatorio_despesas():
         data_fim = request.form.get('data_fim')
 
         if data_inicio and data_fim:
-                data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
-                data_fim = datetime.strptime(data_fim, '%Y-%m-%d')
+            data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
+            data_fim = datetime.strptime(data_fim, '%Y-%m-%d')
 
-                if data_fim < data_inicio:
-                    flash('A data do fim não pode ser menor que a data de inicío!', 'error')
-                    return render_template('relatorio_despesas')
+            if data_fim < data_inicio:
+                flash('A data do fim não pode ser menor que a data de inicío!', 'error')
+                return render_template('relatorio_despesas.html')
 
         query = """
                     SELECT iddespesas, descrição, data, valor
@@ -471,6 +476,11 @@ def relatorio_despesas():
         cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
 
         resultado = cursor.fetchall()
+
+        if not resultado:
+            flash('Não foi encontrada nenhuma despesa no período!', 'error')
+            return render_template('relatorio_despesas.html')
+
         print(resultado)
 
         total_despesas = sum(despesa[3] for despesa in resultado)  # Despesa[3] é o valor
@@ -478,6 +488,15 @@ def relatorio_despesas():
         return render_template('relatorio_despesas.html', despesas=resultado, total_despesas=total_despesas)
 
     return render_template('relatorio_despesas.html', despesa=despesa, total_despesas=total_despesas)
+
+
+'''@app.route('/relatorio_geral', methods=['GET', 'POST'])
+def relatorio_geral():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+
+    if request.method == 'POST':
+        data_inicio = request.form.get('')'''
 
 
 @app.route('/despesas', methods=['GET', 'POST'])
@@ -497,11 +516,23 @@ def despesas():
         conexao.close()
         cursor.close()
         print(f'Despesas foram inseridas {descricao} , {data}, {valor} ')
-        flash('Despesas acrescentadas com sucesso!', 'sucess')
+        flash('Despesa acrescentada com sucesso!', 'sucess')
 
         return render_template('despesas.html')
 
     return render_template('despesas.html')
+
+
+'''@app.route('calcular_orçamento', methods=['GET', 'POST'])
+def calcular_orcamento():
+    resposta = None
+    if request.method == 'POST':
+        valor_orcamento = request.form['valor_orcamento']
+        valor_despesas = request.form['valor_despesas']
+
+        if valor_orcamento and valor_despesas:
+            caluculo = (valor_orcamento + valor_despesas)
+            resposta = caluculo + valor_despesas + (caluculo * 10/100 )'''
 
 
 # Condição para verificar se o projeto esta sendo executado diretamente
