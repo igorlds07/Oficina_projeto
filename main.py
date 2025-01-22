@@ -1,8 +1,15 @@
 import os
 
-from flask import Flask, render_template, request, redirect, url_for, flash
+from datetime import datetime
+from typing import Tuple
+
+import pandas as pd
+
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 
 from BD import conexao_bd
+
+from io import BytesIO
 
 # Nome da aplicação
 app = Flask(__name__)
@@ -50,7 +57,6 @@ def login_user():
         mensagem = 'Acesso liberado'
 
         if mensagem:
-
             return redirect(url_for('index'))
 
     return render_template('login.html', mensagem=mensagem)
@@ -61,6 +67,7 @@ def login_user():
 def index():
     """ Função que renderiza a página de cadastro de clientes.
     Exibe um formulário onde o usuário pode preencher as informações de um novo cliente."""
+
     return render_template('index.html')
 
 
@@ -89,12 +96,12 @@ def cadastrar():
         cursor.close()
         conexao.close()
 
-        flash('Cadastrado com sucesso!', 'sucess')
+        message = 'Cadastrado com sucesso!'
         sucess_mesagge = 'Cadastrado com sucesso'
         print(sucess_mesagge)
 
         # Ao clicar o botão cadastrar e emetido a mensagem de 'sucesso' e  retorna a  página de cadastro
-        return render_template('index.html', )
+        return render_template('index.html', message=message)
 
     return render_template('index.html')  # Ao finalizar o processo retorna a página de cadastro novamente
 
@@ -224,7 +231,6 @@ def clientes():
 
         nome = request.form['nome']
         if nome:
-
             # READ
             # Comando em SQL para buscar o cliente específicado
             comando = 'SELECT  * FROM clientes WHERE nome = %s;'
@@ -239,7 +245,6 @@ def clientes():
 
     # Condição para vereificar se o usuário deseja ver todos os clientes
     if request.method == 'GET' and 'ver_todos' in request.args:
-
         # Comando em SQL para buscar todos os clientes
         comando = 'SELECT * FROM clientes;'
         cursor.execute(comando)
@@ -261,7 +266,7 @@ def funcionarios():
 
     if request.method == 'GET' and 'ver_todos' in request.args:
         comando = 'SELECT * FROM funcionários;'
-        cursor.execute(comando,)
+        cursor.execute(comando, )
         funcionario = cursor.fetchall()
         print(funcionario)
 
@@ -347,7 +352,7 @@ def excluir_funcionario():
 
                     cursor = conexao.cursor()
                     # Comando em SQL para deletar o cliente
-                    cursor.execute(f'DELETE FROM clientes WHERE nome = "{funcionario}";')
+                    cursor.execute(f'DELETE FROM funcionários WHERE nome = "{funcionario}";')
                     print(f'excluindo cliente {funcionario}')
 
                     conexao.commit()
@@ -402,12 +407,182 @@ def editar_funcionario():
     return render_template('editar_funcionario.html', funcionario=None)
 
 
-'''@app.route('/relatorio_orcamentos', methods=['GET', 'POST'])
+@app.route('/relatorio_orcamentos', methods=['GET', 'POST'])
 def relatorio_orcamentos():
     conexao = conexao_bd()
     cursor = conexao.cursor()
+    resultados = None
+
     if request.method == 'POST':
-        data_inico = request.form['data_entrada']'''
+        data_inicio = request.form['data_entrada']
+        data_fim = request.form['data_saida']
+        gerar_excel = request.form.get('gerar_excel')
+
+        if data_inicio and data_fim:
+            data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
+            data_fim = datetime.strptime(data_fim, '%Y-%m-%d')
+
+            if data_inicio > data_fim:
+                flash('A data de inicío não pode ser maior que a data de fim!', 'error')
+                return render_template(
+                    'relatorio_orcamentos.html', )
+
+        # Consulta SQL para buscar orçamentos no período
+        query = """
+            SELECT idclientes, nome, contato, veiculo, data_entrada, data_saida, valor_orcamento
+            FROM clientes
+            WHERE data_entrada BETWEEN %s AND %s
+        """
+        cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
+        resultados = cursor.fetchall()
+
+        if not resultados:
+            flash('Não foi encontrado nenhum orçamento dentro do período!', 'error')
+            return render_template('relatorio_orcamentos.html')
+
+            # Se o botão para gerar Excel foi pressionado
+        if gerar_excel:
+            # Cria um DataFrame com os resultados
+            colunas = ["ID", "Nome", "Contato", "Veículo", "Data Entrada", "Data Saída", "Valor Orçamento"]
+            df = pd.DataFrame(resultados, columns=colunas)
+
+            # Salva o DataFrame em um arquivo Excel na memória
+            output = BytesIO()
+            df.to_excel(output, index=False, sheet_name='Relatório de Orçamentos')
+            output.seek(0)
+
+            # Configura a resposta para download
+            response = make_response(output.getvalue())
+            response.headers["Content-Disposition"] = "attachment; filename=relatorio_orcamentos.xlsx"
+            response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            return response
+
+        message = f'Foram realizados {len(resultados)} orçamentos !'
+
+        conexao.close()
+        cursor.close()
+
+        return render_template('relatorio_orcamentos.html', resultados=resultados, message=message)
+
+    return render_template('relatorio_orcamentos.html', resultados=resultados)
+
+
+@app.route('/relatorio_despesas', methods=['GET', 'POST'])
+def relatorio_despesas():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+    resultado = None
+    despesa = []
+    total_despesas = 0
+
+    if request.method == 'POST':
+        data_inicio = request.form.get('data_inicio')
+        data_fim = request.form.get('data_fim')
+        gerar_excel = request.form.get('gerar_excel')
+
+        if data_inicio and data_fim:
+            data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
+            data_fim = datetime.strptime(data_fim, '%Y-%m-%d')
+
+            if data_fim < data_inicio:
+                flash('A data do fim não pode ser menor que a data de inicío!', 'error')
+                return render_template('relatorio_despesas.html')
+
+        query = """
+                    SELECT iddespesas, descrição, data, valor
+                    FROM despesas
+                    WHERE data BETWEEN %s AND %s
+                """
+        cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
+
+        resultado = cursor.fetchall()
+
+        if not resultado:
+            flash('Não foi encontrada nenhuma despesa no período!', 'error')
+            return render_template('relatorio_despesas.html')
+
+        if gerar_excel:
+            colunas = ["Id", "Descrição", "Data", "Valor"]
+            df = pd.DataFrame(resultado, columns=colunas)
+
+            output = BytesIO()
+            df.to_excel(output, index=False, sheet_name='Relatório de Despesas')
+            output.seek(0)
+
+            response = make_response(output.getvalue())
+            response.headers["Content-Disposition"] = "attachment; filename=relatorio_despesas.xlsx"
+            response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            flash('Arquivo gerado com sucesso!', 'sucess')
+            return response
+
+        print(resultado)
+
+        total_despesas = sum(despesa[3] for despesa in resultado)  # Despesa[3] é o valor
+
+        return render_template('relatorio_despesas.html', despesas=resultado, total_despesas=total_despesas)
+
+    return render_template('relatorio_despesas.html', despesa=despesa, total_despesas=total_despesas)
+
+
+'''@app.route('/relatorio_geral', methods=['GET', 'POST'])
+def relatorio_geral():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+
+    if request.method == 'POST':
+        data_inicio = request.form.get('')'''
+
+
+@app.route('/despesas', methods=['GET', 'POST'])
+def despesas():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+
+    if request.method == 'POST':
+        descricao = request.form['descrição']
+        data = request.form['data']
+        valor = request.form['valor']
+
+        cursor.execute('INSERT INTO despesas(descrição, data, valor)'
+                       'VALUES(%s, %s,%s);', (descricao, data, valor))
+
+        conexao.commit()
+        conexao.close()
+        cursor.close()
+        print(f'Despesas foram inseridas {descricao} , {data}, {valor} ')
+        flash('Despesa acrescentada com sucesso!', 'sucess')
+
+        return render_template('despesas.html')
+
+    return render_template('despesas.html')
+
+
+@app.route('/calcular_orcamento', methods=['GET', 'POST'])
+def calcular_orcamento():
+    preco_venda = None
+    if request.method == 'POST':
+        valor_orcamento = request.form.get('valor_orcamento')
+        valor_despesa = request.form.get('valor_despesas')
+
+        valor_orcamentos = float(valor_orcamento)
+
+        valor_despesas = float(valor_despesa)
+
+        if not valor_orcamento and valor_despesas:
+            flash('Preencha os campos necessários!', 'error')
+            return render_template('calcular_orçamento.html')
+
+        calculo = valor_orcamentos + valor_despesas
+
+        preco_venda = (calculo / 0.80)
+
+        lucro_total = preco_venda - calculo
+
+        flash(f'O valor sugerido para venda é de  R${preco_venda:.2f}', 'success')
+        flash(f'Tendo a margem de 20% de lucro , o lucro total é de R${lucro_total}', 'success')
+        return render_template('calcular_orcamento.html', lucro=preco_venda)
+
+    return render_template('calcular_orcamento.html')
 
 
 # Condição para verificar se o projeto esta sendo executado diretamente

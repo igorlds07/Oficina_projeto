@@ -64,6 +64,7 @@
             text-align: center;
             color: #333;
             margin-bottom: 30px;
+             border-bottom: 2px solid #FF0000;
         }
 
         .form-group {
@@ -172,21 +173,9 @@
             h1 {
                 font-size: 24px;
             }
-            /* Animação de entrada das mensagens */
-        @keyframes slideIn {
-          0% {
-        opacity: 0;
-        top: -50px;
-        }
-        100% {
-        opacity: 1;
-        top: 20px;
-            }
-        }
-
-        /* Fechar mensagem após um tempo */
+          /* Fechar mensagem após um tempo */
         .messages .alert {
-            animation: fadeOut 5s forwards; /* A mensagem desaparece após 4 segundos */
+            animation: fadeOut 6s forwards; /* A mensagem desaparece após 4 segundos */
         }
 
         @keyframes fadeOut {
@@ -221,7 +210,7 @@
         <button>Clientes</button>
         <input type="checkbox">
         <div class="submenu">
-            <a href="/cadastro_cliente">Cadastrar Cliente</a>
+            <a href="/cadastro">Cadastrar Cliente</a>
             <a href="/editar_cliente">Editar Cliente</a>
             <a href="/excluir_cliente">Excluir Cliente</a>
             <a href="/clientes">Visualizar Clientes</a>
@@ -237,6 +226,11 @@
             <a href="/funcionarios">Visualizar Funcionários</a>
         </div>
     </label>
+        <label>
+        <div class="submenu">
+            <a href="/relatorio_orcamentos">Relatórios Orçamentos</a>
+        </div>
+        </label>
 </div>
 {% include 'menu.html' %}
       <!-- Contêiner de Exclusão -->
