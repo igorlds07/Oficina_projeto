@@ -1,10 +1,15 @@
 import os
 
-from flask import Flask, render_template, request, redirect, url_for, flash
-
 from datetime import datetime
+from typing import Tuple
+
+import pandas as pd
+
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 
 from BD import conexao_bd
+
+from io import BytesIO
 
 # Nome da aplicação
 app = Flask(__name__)
@@ -411,6 +416,7 @@ def relatorio_orcamentos():
     if request.method == 'POST':
         data_inicio = request.form['data_entrada']
         data_fim = request.form['data_saida']
+        gerar_excel = request.form.get('gerar_excel')
 
         if data_inicio and data_fim:
             data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
@@ -434,11 +440,24 @@ def relatorio_orcamentos():
             flash('Não foi encontrado nenhum orçamento dentro do período!', 'error')
             return render_template('relatorio_orcamentos.html')
 
-        total = 0
-        for cliente in resultados:
-            total += 1
+            # Se o botão para gerar Excel foi pressionado
+        if gerar_excel:
+            # Cria um DataFrame com os resultados
+            colunas = ["ID", "Nome", "Contato", "Veículo", "Data Entrada", "Data Saída", "Valor Orçamento"]
+            df = pd.DataFrame(resultados, columns=colunas)
 
-        message = f'Foram realizados {total} orçamentos !'
+            # Salva o DataFrame em um arquivo Excel na memória
+            output = BytesIO()
+            df.to_excel(output, index=False, sheet_name='Relatório de Orçamentos')
+            output.seek(0)
+
+            # Configura a resposta para download
+            response = make_response(output.getvalue())
+            response.headers["Content-Disposition"] = "attachment; filename=relatorio_orcamentos.xlsx"
+            response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            return response
+
+        message = f'Foram realizados {len(resultados)} orçamentos !'
 
         conexao.close()
         cursor.close()
@@ -459,6 +478,7 @@ def relatorio_despesas():
     if request.method == 'POST':
         data_inicio = request.form.get('data_inicio')
         data_fim = request.form.get('data_fim')
+        gerar_excel = request.form.get('gerar_excel')
 
         if data_inicio and data_fim:
             data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
@@ -480,6 +500,20 @@ def relatorio_despesas():
         if not resultado:
             flash('Não foi encontrada nenhuma despesa no período!', 'error')
             return render_template('relatorio_despesas.html')
+
+        if gerar_excel:
+            colunas = ["Id", "Descrição", "Data", "Valor"]
+            df = pd.DataFrame(resultado, columns=colunas)
+
+            output = BytesIO()
+            df.to_excel(output, index=False, sheet_name='Relatório de Despesas')
+            output.seek(0)
+
+            response = make_response(output.getvalue())
+            response.headers["Content-Disposition"] = "attachment; filename=relatorio_despesas.xlsx"
+            response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            flash('Arquivo gerado com sucesso!', 'sucess')
+            return response
 
         print(resultado)
 
@@ -523,16 +557,32 @@ def despesas():
     return render_template('despesas.html')
 
 
-'''@app.route('calcular_orçamento', methods=['GET', 'POST'])
+@app.route('/calcular_orcamento', methods=['GET', 'POST'])
 def calcular_orcamento():
-    resposta = None
+    preco_venda = None
     if request.method == 'POST':
-        valor_orcamento = request.form['valor_orcamento']
-        valor_despesas = request.form['valor_despesas']
+        valor_orcamento = request.form.get('valor_orcamento')
+        valor_despesa = request.form.get('valor_despesas')
 
-        if valor_orcamento and valor_despesas:
-            caluculo = (valor_orcamento + valor_despesas)
-            resposta = caluculo + valor_despesas + (caluculo * 10/100 )'''
+        valor_orcamentos = float(valor_orcamento)
+
+        valor_despesas = float(valor_despesa)
+
+        if not valor_orcamento and valor_despesas:
+            flash('Preencha os campos necessários!', 'error')
+            return render_template('calcular_orçamento.html')
+
+        calculo = valor_orcamentos + valor_despesas
+
+        preco_venda = (calculo / 0.80)
+
+        lucro_total = preco_venda - calculo
+
+        flash(f'O valor sugerido para venda é de  R${preco_venda:.2f}', 'success')
+        flash(f'Tendo a margem de 20% de lucro , o lucro total é de R${lucro_total}', 'success')
+        return render_template('calcular_orcamento.html', lucro=preco_venda)
+
+    return render_template('calcular_orcamento.html')
 
 
 # Condição para verificar se o projeto esta sendo executado diretamente
