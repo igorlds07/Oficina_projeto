@@ -1,15 +1,14 @@
 import os
 
 from datetime import datetime
-from typing import Tuple
+
+from io import BytesIO
 
 import pandas as pd
 
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 
 from BD import conexao_bd
-
-from io import BytesIO
 
 # Nome da aplicação
 app = Flask(__name__)
@@ -436,6 +435,18 @@ def relatorio_orcamentos():
         cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
         resultados = cursor.fetchall()
 
+
+        query = """
+               SELECT SUM(valor_orcamento) 
+               FROM clientes
+                WHERE data_entrada BETWEEN %s AND %s
+           """
+        cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
+        total_entradas = cursor.fetchone()[0] or 0
+
+        message = (f'Foram realizados {len(resultados)} Orçamentos.<br>'
+                   f'Total: R${total_entradas:.2f}')
+
         if not resultados:
             flash('Não foi encontrado nenhum orçamento dentro do período!', 'error')
             return render_template('relatorio_orcamentos.html')
@@ -457,7 +468,16 @@ def relatorio_orcamentos():
             response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             return response
 
-        message = f'Foram realizados {len(resultados)} orçamentos !'
+        query = """
+               SELECT SUM(valor_orcamento) 
+               FROM clientes
+                WHERE data_entrada BETWEEN %s AND %s
+           """
+        cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
+        total_entradas = cursor.fetchone()[0] or 0
+
+        message = (f'Foram realizados {len(resultados)} Orçamentos.<br>'
+                   f'Total: R${total_entradas:.2f}')
 
         conexao.close()
         cursor.close()
@@ -557,6 +577,39 @@ def despesas():
     return render_template('despesas.html')
 
 
+@app.route('/excluir_despesa', methods=['GET', 'POST'])
+def excluir_despesa():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+
+    buscar = []
+
+    if request.method == 'POST':
+        # Caso o botão de buscar seja pressionado
+        despesa = request.form.get('descrição')
+        confirmar = request.form.get('confirmar')
+
+        if despesa:
+            cursor.execute('SELECT * FROM despesas WHERE descrição = %s;', (despesa,))
+            buscar = cursor.fetchall()
+            print(buscar)
+
+            if buscar:
+                # Caso o botão de confirmação de exclusão seja pressionado
+                if request.form.get('confirmar') == 'sim':
+                    descricao = buscar[0][1]  # Descrição da despesa
+                    print('botão pressionado')
+                    cursor.execute('DELETE FROM despesas WHERE descrição = %s;', (descricao,))
+                    conexao.commit()
+                    flash(f'Despesa "{descricao}" excluída com sucesso', 'success')
+                    buscar = []  # Limpa a busca após exclusão
+
+            else:
+                flash('Despesa não encontrada!', 'error')
+
+    return render_template('excluir_despesa.html', buscar=buscar)
+
+
 @app.route('/calcular_orcamento', methods=['GET', 'POST'])
 def calcular_orcamento():
     preco_venda = None
@@ -583,6 +636,48 @@ def calcular_orcamento():
         return render_template('calcular_orcamento.html', lucro=preco_venda)
 
     return render_template('calcular_orcamento.html')
+
+
+# Rota para o caixa diário
+@app.route('/caixa_diario', methods=['GET'])
+def caixa_diario():
+    conexao = conexao_bd()
+    cursor = conexao.cursor()
+
+    # Obtendo a data de hoje
+    data_hoje = datetime.now().strftime('%Y-%m-%d')
+
+    # Consulta para buscar entradas (pagamentos ou orçamentos com valor pago)
+    cursor.execute("""
+        SELECT SUM(valor_orcamento) 
+        FROM clientes
+        WHERE DATE(data_entrada) = %s;
+    """, (data_hoje,))
+    total_entradas = cursor.fetchone()[0] or 0  # Caso não haja entradas, soma como 0
+
+    # Consulta para buscar despesas do dia
+    cursor.execute("""
+        SELECT SUM(valor) 
+        FROM despesas 
+        WHERE DATE(data) = %s;
+    """, (data_hoje,))
+    total_despesas = cursor.fetchone()[0] or 0  # Caso não haja despesas, soma como 0
+
+    # Calculando o saldo do caixa
+    saldo_caixa = total_entradas - total_despesas
+
+    # Fechando a conexão com o banco
+    conexao.close()
+    cursor.close()
+
+    # Exibindo na interface
+    return render_template(
+        'caixa_diario.html',
+        data_hoje=data_hoje,
+        total_entradas=total_entradas,
+        total_despesas=total_despesas,
+        saldo_caixa=saldo_caixa
+    )
 
 
 # Condição para verificar se o projeto esta sendo executado diretamente
