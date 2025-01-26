@@ -292,45 +292,43 @@ def funcionarios():
 def funcionarios_atualizar():
     conexao = conexao_bd()
     cursor = conexao.cursor()
-    funcionario = None
 
     if request.method == 'POST':
+        # Obter o ID ou nome do funcionário selecionado
+        funcionario_id = request.form.get('funcionario_id')
+        total_pecas = request.form.get('total_peças', type=int) or 0
+        total_comissao = total_pecas * 70
 
-        nome_funcionario = request.form.get('nome')
+        if funcionario_id:
+            cursor.execute('SELECT * FROM funcionários WHERE idFuncionários = %s;', (funcionario_id,))
+            funcionario_escolhido = cursor.fetchone()
 
-        cursor.execute('SELECT * FROM funcionários WHERE nome = %s;', (nome_funcionario,))
-        funcionario_escolhido = cursor.fetchall()
+            if funcionario_escolhido:
+                # Atualizar as peças no banco de dados
+                total_pecas_atual = funcionario_escolhido[4] if funcionario_escolhido[4] is not None else 0
+                total_comissao_atual = funcionario_escolhido[5] if funcionario_escolhido[5] is not None else 0
 
-        if funcionario_escolhido:
-            funcionario_escolhido = funcionario_escolhido[0]
+                novo_total_pecas = total_pecas_atual + total_pecas
+                novo_total_comissao = total_comissao_atual + total_comissao
 
-            # Obter os valores do formulário
-            total_pecas = request.form.get('total_peças', 0)  # Valor padrão de 0 caso não seja enviado
-            valor_comissao = request.form.get('valor_comissão', 0)  # Valor padrão de 0 caso não seja enviado
-
-            # Recuperar os valores do banco de dados e substituir None por 0
-            total_pecas_db = funcionario_escolhido[0][5] if funcionario_escolhido[0][5] is not None else 0
-            valor_comissao_db = funcionario_escolhido[0][6] if funcionario_escolhido[0][6] is not None else 0
-
-            # Somar os valores antigos com os novos
-            novo_total_pecas = total_pecas_db + int(total_pecas)  # Soma de total_peças
-            novo_valor_comissao = valor_comissao_db + float(valor_comissao)  # Soma de valor_comissão
-
-            # Atualiza o banco de dados com os valores acumulados
-            comando = """UPDATE funcionários 
-                                               SET total_peças = %s, valor_comissão = %s 
-                                               WHERE nome = %s;"""
-            cursor.execute(comando, (novo_total_pecas, novo_valor_comissao, funcionario_escolhido[0][0]))
-            conexao.commit()
-            conexao.close()
-            flash('Valores adicionados com sucesso!', 'sucess')
-
-            return render_template('funcionarios_atualizar.html', funcionario=funcionario_escolhido)
-
+                cursor.execute('''UPDATE funcionários 
+                                  SET total_peças = %s, valor_comissão = %s 
+                                  WHERE idFuncionários = %s;''',
+                               (novo_total_pecas, novo_total_comissao, funcionario_id))
+                conexao.commit()
+                flash('Número de peças atualizado com sucesso!', 'success')
+            else:
+                flash('Funcionário não encontrado!', 'error')
         else:
-            flash('Funcionário não encontrado!', 'error')
+            flash('Por favor, selecione um funcionário.', 'error')
 
-    return render_template('funcionarios_atualizar.html', funcionario=funcionario)
+    # Carregar todos os funcionários para exibir na lista
+    cursor.execute('SELECT * FROM funcionários')
+    funcionarios = cursor.fetchall()
+
+    conexao.close()
+
+    return render_template('funcionarios_atualizar.html', funcionarios=funcionarios)
 
 
 @app.route('/excluir_funcionario', methods=['GET', 'POST'])
@@ -434,7 +432,6 @@ def relatorio_orcamentos():
         """
         cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
         resultados = cursor.fetchall()
-
 
         query = """
                SELECT SUM(valor_orcamento) 
@@ -612,7 +609,7 @@ def excluir_despesa():
 
 @app.route('/calcular_orcamento', methods=['GET', 'POST'])
 def calcular_orcamento():
-    preco_venda = None
+
     if request.method == 'POST':
         valor_orcamento = request.form.get('valor_orcamento')
         valor_despesa = request.form.get('valor_despesas')

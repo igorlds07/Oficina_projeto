@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atualizar comissão</title>
+    <title>Atualizar Comissão</title>
     <style>
         /* Resetando margens e preenchimentos */
         * {
@@ -16,52 +16,26 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             margin-bottom: 80px; /* Para evitar sobreposição com o menu */
-        }
-
-        /* Estilo para o menu superior com botões */
-        .menu {
-            position: fixed;
-            top: 20px; /* Posiciona o menu mais para baixo */
-            left: 20px;
-            z-index: 1000; /* Certifica que o botão fique sempre sobreposto */
-            display: flex;
-            flex-direction: column;  /* Organiza os botões em coluna */
-            gap: 15px;
-        }
-
-        .menu button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 5px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-
-        .menu button:hover {
-            background-color: #0056b3;
-            transform: scale(1.05);
+            padding-top: 60px; /* Espaço no topo para o menu fixo */
         }
 
         /* Estilo para o conteúdo da página de cadastro */
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 800px;
             margin: 100px auto;
-            background-color: #fff;
+            margin-left: 350px;
             padding: 30px;
+            background-color: #fff;
             border-radius: 8px;
             box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
         }
 
-        h1 {
+        h1, h2 {
             text-align: center;
             color: #333;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .form-group {
@@ -77,7 +51,7 @@
 
         .form-group input, .form-group select {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 16px;
@@ -91,57 +65,95 @@
             outline: none;
         }
 
-        .form-group input[type="submit"] {
-            background-color: #28a745;
+        /* Estilo para a tabela de funcionários */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            table-layout: fixed;
+        }
+
+        table th, table td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        table td {
+            background-color: #fff;
+        }
+
+        /* Estilo para os botões de opção (radio) */
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        label {
+            cursor: pointer;
+            font-size: 16px;
+            color: #333;
+        }
+
+        /* Estilo para os botões */
+        .btn-atualizar, .btn-buscar {
+            background-color: #007bff;
             color: white;
             border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            font-size: 18px;
-            padding: 15px;
             border-radius: 5px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        .form-group input[type="submit"]:hover {
-            background-color: #218838;
+        .btn-atualizar:hover, .btn-buscar:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
         }
 
-        .error {
-            color: red;
-            text-align: center;
-            font-size: 14px;
+        /* Estilo para as mensagens */
+        .messages .alert {
+            padding: 12px;
             margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .alert-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .alert-error {
+            background-color: #dc3545;
+            color: white;
         }
 
         /* Responsividade: ajuste para telas menores */
         @media screen and (max-width: 768px) {
-            body {
-                padding: 0 15px; /* Espaçamento nas laterais */
-            }
-
-            .menu {
-                top: 10px; /* Ajuste da posição para dispositivos pequenos */
-                left: 10px;
-            }
-
-            .menu button {
-                padding: 10px 20px;  /* Menor tamanho de botão em telas pequenas */
-                font-size: 14px;  /* Menor tamanho de texto nos botões */
-            }
-
             .container {
                 width: 100%;  /* Aumenta o tamanho do container */
-                padding: 15px; /* Reduz o preenchimento para dispositivos móveis */
-                margin-top: 100px;  /* Garante que o menu não sobreponha o conteúdo */
+                padding: 20px; /* Reduz o preenchimento para dispositivos móveis */
+                margin-top: 120px;  /* Garante que o menu não sobreponha o conteúdo */
             }
 
-            h1 {
-                font-size: 24px;  /* Reduz o tamanho do título em telas pequenas */
+            h1, h2 {
+                font-size: 22px;  /* Reduz o tamanho do título em telas pequenas */
+            }
+
+            table {
+                width: 100%;
+                font-size: 14px; /* Menor fonte em telas menores */
             }
 
             .form-group input,
             .form-group select {
-                padding: 10px;  /* Ajuste de preenchimento em inputs */
+                padding: 12px;  /* Ajuste de preenchimento em inputs */
                 font-size: 14px;  /* Reduz o tamanho da fonte em campos de input */
             }
 
@@ -149,44 +161,12 @@
                 padding: 12px;  /* Ajuste de preenchimento para o botão de envio */
             }
         }
-
-        /* Estilo para a mensagem de sucesso */
-        .success {
-            position: absolute;
-            top: 120%;
-            margin-top: 20px;
-            background-color: rgba(40, 167, 69, 0.9); /* Cor de fundo verde */
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            font-size: 18px;
-            text-align: center;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            opacity: 0;
-            visibility: hidden;
-            animation: fadeIn 3s forwards;
-        }
-
-        /* Animação de fade-in */
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                visibility: hidden;
-            }
-            100% {
-                opacity: 1;
-                visibility: visible;
-            }
-        }
     </style>
-
 </head>
 <body>
+
 <!-- Menu Superior com Botões -->
-<div class="menu">
-    <!-- Botão que redireciona para a página de edição -->
-    <button onclick="window.location.href='/funcionarios/atualizar'">Atualizar comissão</button>
-</div>
+{% include 'menu.html' %}
 
 <!-- Formulário de comissão do funcionário -->
 <div class="container">
@@ -205,35 +185,37 @@
         {% endif %}
     {% endwith %}
 
-    <form method="POST">
+    <form action="/funcionarios_atualizar" method="POST">
+        <h2>Escolha o Funcionário para Atualizar:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Selecione</th>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for funcionario in funcionarios %}
+                <tr>
+                    <td><input type="radio" id="funcionario_{{ funcionario[0] }}" name="funcionario_id" value="{{ funcionario[0] }}"></td>
+                    <td><label for="funcionario_{{ funcionario[0] }}">{{ funcionario[1] }}</label></td>
+                    <td>{{ funcionario[3] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
         <div class="form-group">
-            <label for="nome_funcionario">Nome do Funcionário:</label>
-            <input type="text" id="nome_funcionario" name="nome" placeholder="Digite o nome do funcionário" required>
+            <label for="total_peças">Total de Peças Feitas:</label>
+            <input type="number" id="total_peças" name="total_peças" placeholder="Digite o total de peças feitas" required>
         </div>
 
-        <button type="submit">Buscar</button>
+        <div class="form-group">
+            <input type="submit" value="Atualizar Número de Peças" class="btn-atualizar">
+        </div>
     </form>
 
-    <!-- Quando o funcionário for encontrado, exibe o formulário para atualização -->
-    {% if funcionario %}
-        {% if funcionario[0] == 'Funcionário não encontrado' %}
-            <p class="error-message">{{ funcionario[0] }}</p>
-        {% else %}
-            <form method="POST">
-                <div class="form-group">
-                    <label for="total_peças">Total de Peças Feitas: R$ 70,00</label>
-                    <input type="number" id="total_peças" name="total_peças" placeholder="Digite o total de peças feitas" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="valor_comissão">Valor da Comissão:</label>
-                    <input type="number" step="0.01" id="valor_comissão" name="valor_comissão" placeholder="Digite o valor da comissão" required>
-                </div>
-
-                <button type="submit">Atualizar</button>
-            </form>
-        {% endif %}
-    {% endif %}
 </div>
 
 </body>
