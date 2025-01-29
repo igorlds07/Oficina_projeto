@@ -264,7 +264,7 @@ def funcionarios():
     funcionario = []
 
     if request.method == 'GET' and 'ver_todos' in request.args:
-        comando = 'SELECT * FROM funcionários;'
+        comando = 'SELECT idFuncionários, nome, contato, cargo FROM funcionários;'
         cursor.execute(comando, )
         funcionario = cursor.fetchall()
         print(funcionario)
@@ -311,14 +311,23 @@ def funcionarios_atualizar():
                 novo_total_pecas = total_pecas_atual + total_pecas
                 novo_total_comissao = total_comissao_atual + total_comissao
 
+                data_comissao = datetime.now().strftime('%Y-%m-%d')
+
                 cursor.execute('''UPDATE funcionários 
                                   SET total_peças = %s, valor_comissão = %s 
                                   WHERE idFuncionários = %s;''',
                                (novo_total_pecas, novo_total_comissao, funcionario_id))
+
+                cursor.execute(
+
+                    '''INSERT INTO comissoes (idFuncionários, data_comissao, total_pecas, valor_comissao)
+                                                      VALUES (%s, %s, %s, %s);''',
+                    (funcionario_id, data_comissao, total_pecas, total_comissao))
+
+                conexao.commit()
                 conexao.commit()
                 flash('Número de peças atualizado com sucesso!', 'success')
-            else:
-                flash('Funcionário não encontrado!', 'error')
+
         else:
             flash('Por favor, selecione um funcionário.', 'error')
 
@@ -541,13 +550,65 @@ def relatorio_despesas():
     return render_template('relatorio_despesas.html', despesa=despesa, total_despesas=total_despesas)
 
 
-'''@app.route('/relatorio_geral', methods=['GET', 'POST'])
-def relatorio_geral():
-    conexao = conexao_bd()
+@app.route('/relatorio_comissao', methods=['GET', 'POST'])
+def relatorio_comissao():
+    funcionario = None
+    conexao = conexao_bd()  # Conexão ao banco de dados
     cursor = conexao.cursor()
 
     if request.method == 'POST':
-        data_inicio = request.form.get('')'''
+        # Pegar as datas do formulário
+        data_inicio = request.form.get('data_inicio')
+        data_fim = request.form.get('data_fim')
+        gerar_excel = request.form.get('gerar_excel')
+
+        # Validação: Data de início não pode ser maior que a data de fim
+        if data_fim < data_inicio:
+            flash('A data final não pode ser menor que a data de início!', 'error')
+            return render_template('relatorio_comissao.html')
+
+        if data_inicio and data_fim:
+            # Converter strings de data para objetos datetime
+            data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
+            data_fim = datetime.strptime(data_fim, '%Y-%m-%d')
+
+            # Consulta SQL para buscar os dados de comissão no período
+            query = """
+                SELECT f.idFuncionários, f.nome, f.cargo, c.total_pecas, c.valor_comissao, c.data_comissao
+                    FROM funcionários f
+                    JOIN comissoes c ON f.idFuncionários = c.idFuncionários
+                    WHERE c.data_comissao BETWEEN %s AND %s
+            """
+
+            # Executar a consulta
+            cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
+            funcionario = cursor.fetchall()
+            print(funcionario)
+
+        if gerar_excel:
+            colunas = ["Id", "Nome", "Cargo", "Total Peças", "Valor Comissão", "Data da Comissão"]
+            df = pd.DataFrame(funcionario, columns=colunas)
+
+            output = BytesIO()
+            df.to_excel(output, index=False, sheet_name='Relatório de Comissão')
+            output.seek(0)
+
+            response = make_response(output.getvalue())
+            response.headers["Content-Disposition"] = "attachment; filename=relatorio_comissões.xlsx"
+            response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            flash('Arquivo gerado com sucesso!', 'sucess')
+            return response
+
+        if not funcionario:
+            flash('Não foi encontrado nenhum dado entre o período!', 'error')
+            return render_template('relatorio_comissao.html')
+
+    # Fechar conexão com o banco de dados
+    conexao.close()
+    cursor.close()
+
+    # Renderizar a página com os dados
+    return render_template('relatorio_comissao.html', funcionario=funcionario)
 
 
 @app.route('/despesas', methods=['GET', 'POST'])

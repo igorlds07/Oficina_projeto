@@ -19,7 +19,16 @@
             flex-direction: column;
             gap: 20px;
         }
+                    /* Itens do menu - Não usamos flex-grow para todos */
+.menu-item {
+    display: flex;
+    flex-direction: column;
+}
 
+/* Aplique o margin-top: auto no botão "Sair" */
+.sair-button {
+    margin-top: auto;
+}
         /* Estilo para os itens principais do menu */
         .menu-item {
             position: relative;
@@ -121,7 +130,7 @@
             <div class="submenu">
                 <a href="/relatorio_orcamentos">Relatório de Orçamentos</a>
                 <a href="/relatorio_despesas">Relatório de Despesas</a>
-                <a href="/relatorio_funcionarios">Relatório de Funcionários</a>
+                <a href="/relatorio_comissao">Relatório de Comissão</a>
             </div>
         </div>
         <div class="menu-item">
@@ -135,6 +144,12 @@
             <button tabindex="0">Calcular Orçamentos</button>
             <div class="submenu">
                 <a href="/calcular_orcamento">Calcular</a>
+            </div>
+        </div>
+        <div class="menu-item sair-button">
+            <button tabindex="0">Sair</button>
+            <div class="submenu">
+                <a href="/">Confirmar</a>
             </div>
         </div>
     </div>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatório de Despesas</title>
+    <title>Relatório de Comissão</title>
     <style>
         /* Estilização geral */
         body {
@@ -15,6 +15,7 @@
             color: #333;
         }
 
+        /* Container principal */
         .container {
             width: 70%;
             position: relative;
@@ -54,6 +55,10 @@
             gap: 10px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             z-index: 10;
+        }
+
+        .menu label {
+            display: block;
         }
 
         .menu button {
@@ -108,6 +113,45 @@
 
         form button:hover {
             background-color: #0056b3;
+        }
+
+        /* Mensagens flash */
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        .flash-messages li {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .flash-messages .error {
+            background-color: #f8d7da;
+            color: #842029;
+            animation: fadeOut 6s forwards; /* A mensagem desaparece após 4 segundos */
+        }
+         @keyframes fadeOut {
+        0% {
+        opacity: 1;
+        }
+        100% {
+        opacity: 0;
+        visibility: hidden;
+        top: -50px;
+        }
+
+        .flash-messages .info {
+            background-color: #cff4fc;
+            color: #055160;
+        }
+
+        .flash-messages .success {
+            background-color: #d4edda;
+            color: #155724;
         }
 
         /* Tabela */
@@ -171,43 +215,18 @@
             font-size: 20px;
             font-weight: bold;
             text-align: center;
-            background-color: #cce5ff; /* Fundo azul claro */
-            color: #004085; /* Cor do texto azul escuro */
-            border: 1px solid #b8daff; /* Borda azul claro */
+            background-color: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
         }
-         .flash-messages {
-            list-style: none;
-            padding: 0;
-        }
-        .flash-messages .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-             animation: fadeOut 6s forwards; /* A mensagem desaparece após 4 segundos */
-        }
-
-
-        @keyframes fadeOut {
-        0% {
-        opacity: 1;
-        }
-        100% {
-        opacity: 0;
-        visibility: hidden;
-        top: -50px;
-        }
-        }
-
     </style>
 </head>
 <body>
     {% include 'menu.html' %}
+
     <div class="container">
         <header>
-            <h1>Relatório de Despesas</h1>
+            <h1>Relatório de Comissão</h1>
         </header>
 
         <!-- Exibição de mensagens flash -->
@@ -223,51 +242,51 @@
             {% endwith %}
         </div>
 
-        <!-- Formulário de Filtro -->
-        <form method="POST" action="/relatorio_despesas">
-            <label for="data_inicio">Data de Início:</label>
+        <!-- Formulário de seleção de datas -->
+        <form method="POST">
+            <label for="data_inicio">Data Início:</label>
             <input type="date" id="data_inicio" name="data_inicio" required>
 
-            <label for="data_fim">Data de Fim:</label>
+            <label for="data_fim">Data Fim:</label>
             <input type="date" id="data_fim" name="data_fim" required>
 
             <button type="submit">Gerar Relatório</button>
         </form>
-         <form method="POST" action="/relatorio_despesas">
-    <input type="hidden" name="data_inicio" value="{{ request.form['data_inicio'] }}">
-    <input type="hidden" name="data_fim" value="{{ request.form['data_fim'] }}">
-    <button type="submit" name="gerar_excel" value="1">Exportar para Excel</button>
-</form>
 
-        {% if despesas %}
+        <!-- Exportar para Excel -->
+        <form method="POST" action="/relatorio_comissao">
+            <input type="hidden" name="data_inicio" value="{{ request.form['data_inicio'] }}">
+            <input type="hidden" name="data_fim" value="{{ request.form['data_fim'] }}">
+            <button type="submit" name="gerar_excel" value="1">Exportar para Excel</button>
+        </form>
+
+        <!-- Exibição dos resultados -->
+        {% if funcionario %}
             <h2>Resultados</h2>
-            {% if total_despesas %}
-                <div class="message-relatorio">
-                    <strong>Total de Despesas:</strong> R$ {{ total_despesas | round(2) }}
-                </div>
-            {% endif %}
-
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Descrição</th>
-                        <th>Data</th>
-                        <th>Valor</th>
+                        <th>ID Funcionário</th>
+                        <th>Nome</th>
+                        <th>Cargo</th>
+                        <th>Total de Peças</th>
+                        <th>Valor da Comissão</th>
+                        <th>Data da Comissão</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for despesa in despesas %}
+                    {% for func in funcionario %}
                         <tr>
-                            <td>{{ despesa[0] }}</td>  <!-- ID -->
-                            <td>{{ despesa[1] }}</td>  <!-- Descrição -->
-                            <td>{{ despesa[2] }}</td>  <!-- Valor -->
-                            <td>R$ {{ despesa[3] }}</td>  <!-- Data de Entrada -->
+                            <td>{{ func[0] }}</td>
+                            <td>{{ func[1] }}</td>
+                            <td>{{ func[2] }}</td>
+                            <td>{{ func[3] }}</td>
+                            <td>R${{ func[4] }}</td>
+                            <td>{{ func[5] }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-
         {% endif %}
     </div>
 </body>

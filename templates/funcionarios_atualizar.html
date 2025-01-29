@@ -133,6 +133,21 @@
             background-color: #dc3545;
             color: white;
         }
+         /* Fechar mensagem após um tempo */
+        .messages .alert {
+            animation: fadeOut 6s forwards; /* A mensagem desaparece após 4 segundos */
+        }
+
+        @keyframes fadeOut {
+        0% {
+        opacity: 1;
+        }
+        100% {
+        opacity: 0;
+        visibility: hidden;
+        top: -50px;
+        }
+        }
 
         /* Responsividade: ajuste para telas menores */
         @media screen and (max-width: 768px) {
