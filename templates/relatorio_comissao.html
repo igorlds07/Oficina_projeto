@@ -6,219 +6,190 @@
     <title>Relatório de Comissão</title>
     <style>
         /* Estilização geral */
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
-        }
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+}
 
-        /* Container principal */
-        .container {
-            width: 70%;
-            position: relative;
-            left: 10%;
-            margin: 0 auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+/* Container principal */
+.container {
+    width: 65%;
+    position: relative;
+    left: 10%;
+    margin: 0 auto;
+    margin-left: 220px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
-        /* Header */
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
 
-        header h1 {
-            font-size: 2em;
-            color: #333;
-            border-bottom: 2px solid #007BFF;
-            display: inline-block;
-            padding-bottom: 5px;
-        }
-
-        /* Menu lateral fixo */
+header h1 {
+    font-size: 2em;
+    color: #333;
+    border-bottom: 2px solid #007BFF;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+/* Menu lateral fixo */
         .menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 250px;
-            background-color: #007bff;
-            padding: 20px 10px;
+             position: fixed;
+            top: 20px;
+            left: 20px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            z-index: 10;
-        }
-
-        .menu label {
-            display: block;
-        }
-
-        .menu button {
-            background-color: #0056b3;
-            color: white;
-            border: none;
-            padding: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 5px;
-            text-align: left;
-            width: 100%;
-            transition: background-color 0.3s ease;
-        }
-
-        .menu button:hover {
-            background-color: #003f88;
-        }
-
-        /* Formulário */
-        form {
-            margin-bottom: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        form label {
-            flex: 1 1 100%;
-            font-weight: bold;
-        }
-
-        form input[type="date"] {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 100%;
-            max-width: 300px;
-            box-sizing: border-box;
-        }
-
-        form button {
-            padding: 10px 15px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        form button:hover {
-            background-color: #0056b3;
-        }
-
-        /* Mensagens flash */
-        .flash-messages {
-            list-style: none;
-            padding: 0;
-            margin: 10px 0;
-        }
-
-        .flash-messages li {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        .flash-messages .error {
-            background-color: #f8d7da;
-            color: #842029;
-            animation: fadeOut 6s forwards; /* A mensagem desaparece após 4 segundos */
-        }
-         @keyframes fadeOut {
-        0% {
-        opacity: 1;
-        }
-        100% {
-        opacity: 0;
-        visibility: hidden;
-        top: -50px;
-        }
-
-        .flash-messages .info {
-            background-color: #cff4fc;
-            color: #055160;
-        }
-
-        .flash-messages .success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        /* Tabela */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            background-color: white;
-            border: 1px solid #ddd;
-        }
-
-        table thead {
-            background-color: #007BFF;
-            color: white;
-        }
-
-        table th, table td {
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        table tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        table tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        table th {
-            font-weight: bold;
-        }
-
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .container {
-                width: 95%;
-                padding: 10px;
+            z-index: 10; /* Adicionando o z-index */
             }
 
-            form {
-                flex-direction: column;
-            }
 
-            form input[type="date"], form button {
-                width: 100%;
-            }
+/* Formulário */
+form {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
 
-            table {
-                font-size: 14px;
-            }
-        }
+form label {
+    flex: 1 1 100%;
+    font-weight: bold;
+}
 
-        /* Estilo único para a mensagem abaixo dos resultados */
-        .message-relatorio {
-            padding: 15px;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            background-color: #cce5ff;
-            color: #004085;
-            border: 1px solid #b8daff;
-        }
+form input[type="date"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 300px;
+    box-sizing: border-box;
+}
+
+form button {
+    padding: 10px 15px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+/* Mensagens flash */
+.flash-messages {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.flash-messages li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.flash-messages .error {
+    background-color: #f8d7da;
+    color: #842029;
+    animation: fadeOut 6s forwards;
+}
+
+.flash-messages .info {
+    background-color: #cff4fc;
+    color: #055160;
+}
+
+.flash-messages .success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+}
+
+/* Tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: white;
+    border: 1px solid #ddd;
+}
+
+table thead {
+    background-color: #007BFF;
+    color: white;
+}
+
+table th, table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+table tr:hover {
+    background-color: #f1f1f1;
+}
+
+table th {
+    font-weight: bold;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
+
+    form {
+        flex-direction: column;
+    }
+
+    form input[type="date"], form button {
+        width: 100%;
+    }
+
+    table {
+        font-size: 14px;
+    }
+}
+
+/* Estilo único para a mensagem abaixo dos resultados */
+.message-relatorio {
+    padding: 15px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    background-color: #cce5ff;
+    color: #004085;
+    border: 1px solid #b8daff;
+}
+
     </style>
 </head>
 <body>
@@ -229,20 +200,16 @@
             <h1>Relatório de Comissão</h1>
         </header>
 
-        <!-- Exibição de mensagens flash -->
-        <div>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <ul class="flash-messages">
-                        {% for category, message in messages %}
-                            <li class="{{ category }}">{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
-        </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
 
-        <!-- Formulário de seleção de datas -->
         <form method="POST">
             <label for="data_inicio">Data Início:</label>
             <input type="date" id="data_inicio" name="data_inicio" required>
@@ -253,14 +220,12 @@
             <button type="submit">Gerar Relatório</button>
         </form>
 
-        <!-- Exportar para Excel -->
         <form method="POST" action="/relatorio_comissao">
             <input type="hidden" name="data_inicio" value="{{ request.form['data_inicio'] }}">
             <input type="hidden" name="data_fim" value="{{ request.form['data_fim'] }}">
             <button type="submit" name="gerar_excel" value="1">Exportar para Excel</button>
         </form>
 
-        <!-- Exibição dos resultados -->
         {% if funcionario %}
             <h2>Resultados</h2>
             <table>
