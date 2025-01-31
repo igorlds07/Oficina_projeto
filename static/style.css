@@ -1,21 +1,22 @@
-/* Estilo para o menu fixo */
+/* Estilização do menu */
 .menu {
     position: fixed;
     top: 0;
     left: 0;
-    height: 100%;
+    height: 100vh;
     width: 250px;
     background-color: #007bff;
     padding: 20px 10px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    justify-content: space-between;
 }
 
-/* Estilo para os itens principais do menu */
+/* Estilo dos botões do menu */
 .menu-item {
-    position: relative; /* Necessário para alinhar submenus */
+    display: flex;
+    flex-direction: column;
 }
 
 .menu-item > button {
@@ -29,6 +30,9 @@
     border-radius: 5px;
     text-align: left;
     width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     transition: background-color 0.3s ease;
 }
 
@@ -36,18 +40,18 @@
     background-color: #003f88;
 }
 
-/* Estilo para os submenus */
+/* Submenus */
 .submenu {
     display: none;
-    position: absolute; /* Permite posicionar o submenu logo abaixo */
-    top: 100%; /* Alinha o submenu logo abaixo do botão */
-    left: 0;
+    position: absolute;
+    top: 0;
+    left: 100%;
     background-color: #0056b3;
     border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
     padding: 10px 0;
     flex-direction: column;
-    width: 100%;
+    width: 200px;
 }
 
 .submenu a {
@@ -63,7 +67,12 @@
     background-color: #003f88;
 }
 
-/* Exibir submenu ao passar o mouse */
-.menu-item:hover .submenu {
-    display: flex; /* Exibe o submenu */
+/* Exibir submenu ao clicar */
+.menu-item:focus-within .submenu {
+    display: flex;
+}
+
+/* Garante que o botão "Sair" fique sempre no final */
+.sair-button {
+    margin-top: auto;
 }

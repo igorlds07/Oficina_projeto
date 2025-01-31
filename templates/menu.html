@@ -10,7 +10,7 @@
             position: fixed;
             top: 0;
             left: 0;
-            height: 100%;
+            height: 100vh; /* Define o menu com altura fixa */
             width: 250px;
             background-color: #007bff;
             padding: 20px 10px;
@@ -19,7 +19,17 @@
             flex-direction: column;
             gap: 20px;
         }
+                    /* Itens do menu - Não usamos flex-grow para todos */
+.menu-item {
+    display: flex;
+    flex-direction: column;
+}
 
+/* Aplique o margin-top: auto no botão "Sair" */
+.sair-button {
+    margin-top: auto;
+     margin-bottom: 40px; /* Ajuste a altura conforme necessário */
+}
         /* Estilo para os itens principais do menu */
         .menu-item {
             position: relative;
@@ -112,6 +122,7 @@
                 <a href="/editar_funcionario">Editar Funcionário</a>
                 <a href="/excluir_funcionario">Excluir Funcionário</a>
                 <a href="/funcionarios">Visualizar Funcionários</a>
+                <a href="/funcionarios_atualizar">Atualizar Comissão</a>
             </div>
         </div>
          <!-- Novo botão: Relatórios -->
@@ -120,7 +131,7 @@
             <div class="submenu">
                 <a href="/relatorio_orcamentos">Relatório de Orçamentos</a>
                 <a href="/relatorio_despesas">Relatório de Despesas</a>
-                <a href="/relatorio_funcionarios">Relatório de Funcionários</a>
+                <a href="/relatorio_comissao">Relatório de Comissão</a>
             </div>
         </div>
         <div class="menu-item">
@@ -134,6 +145,12 @@
             <button tabindex="0">Calcular Orçamentos</button>
             <div class="submenu">
                 <a href="/calcular_orcamento">Calcular</a>
+            </div>
+        </div>
+        <div class="menu-item sair-button">
+            <button tabindex="0">Sair</button>
+            <div class="submenu">
+                <a href="/">Confirmar</a>
             </div>
         </div>
     </div>

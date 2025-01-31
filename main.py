@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 
 from io import BytesIO
+from typing import List, Any, Dict
 
 import pandas as pd
 
@@ -199,7 +200,7 @@ def excluir_cliente():
 
                     conexao.commit()
                     print(f'cliente excluido com  successo')
-                    flash(f'Cliente {nome_cliente} excluído com sucesso!', 'success')
+                    flash(f'Cliente {nome_cliente} excluído com sucesso!', 'success')  # mensagem de sucesso
                     return render_template('excluir_cliente.html', cliente=None)  # Redireciona após exclusão
 
             else:
@@ -256,21 +257,31 @@ def clientes():
     return render_template('clientes.html', clientes=cliente_cadastrado)
 
 
+# Rota para adicionar funcionário e visualizar a lista de funcionários
 @app.route('/funcionarios', methods=['GET', 'POST'])
 def funcionarios():
+    """Função para captar as informações do novo funcionário, e também de visualizar todos os seus funcionários já
+    já cadastrados"""
+
+    # Conexão com o banco de dados
     conexao = conexao_bd()
     cursor = conexao.cursor()
 
     funcionario = []
 
+    # Condição para ver se o usuário deseja ver todos os funcionários
     if request.method == 'GET' and 'ver_todos' in request.args:
-        comando = 'SELECT * FROM funcionários;'
+
+        # Executa o comado em SQL para buscar todos os funcionários cadastrados
+        comando = 'SELECT idFuncionários, nome, contato, cargo FROM funcionários;'
         cursor.execute(comando, )
-        funcionario = cursor.fetchall()
+        funcionario = cursor.fetchall()  # Converte em uma lista de funcionários
         print(funcionario)
 
+        # Retorna no template o resultado da busca
         return render_template('funcionarios.html', funcionarios=funcionario)
 
+    # Condição para pegar os dados passados no formulário para cadastrar um novo funcionário
     if request.method == 'POST':
         nome = request.form['nome']
         contato = request.form['contato']
@@ -278,63 +289,98 @@ def funcionarios():
 
         # Verifica se já existe um funcionário com esse nome (ou outro identificador)
         comando = "INSERT INTO funcionários (nome, contato, cargo) VALUES (%s, %s, %s);"
-        cursor.execute(comando, (nome, contato, cargo))
+        cursor.execute(comando, (nome, contato, cargo))  # Executa o comando SQL para inserir o novo funcionário
         conexao.commit()
-        flash('Funcionário cadastrado com sucesso !', 'success')
+        flash('Funcionário cadastrado com sucesso !', 'success')  # menagem de sucesso ao cadastrar
         funcionarios_cadastrados = cursor.fetchall()
 
+        # Retorna o template com o funcionário cadastrado
         return render_template('funcionarios.html', funcionarios=funcionarios_cadastrados)
 
     return render_template('funcionarios.html')
 
 
+# Rota para atualizar a comissão do funcionário
 @app.route('/funcionarios_atualizar', methods=['GET', 'POST'])
 def funcionarios_atualizar():
+    """Função para atualizar a comissão do funcionário existente, com o modelo acumulativo mensalmente
+    e é zerado após inicio de cada mês"""
+
+    # Conexão com o banco de dados
     conexao = conexao_bd()
     cursor = conexao.cursor()
-    funcionario = None
 
+    # Condição para resgatar o funcionário escolhido pelo administrador
     if request.method == 'POST':
+        # Obter o ID ou nome do funcionário selecionado
+        funcionario_id = request.form.get('funcionario_id')
+        total_pecas = request.form.get('total_peças', type=int) or 0
 
-        nome_funcionario = request.form.get('nome')
+        # multiplica a quantidade de peças com o valor estabelicdo por peça que é R$70
+        total_comissao = total_pecas * 70
 
-        cursor.execute('SELECT * FROM funcionários WHERE nome = %s;', (nome_funcionario,))
-        funcionario_escolhido = cursor.fetchall()
+        # Condição que só é executada se algum funcionário selecionado
+        if funcionario_id:
 
-        if funcionario_escolhido:
-            funcionario_escolhido = funcionario_escolhido[0]
+            # Comando em SQL para buscar o funcionário escolhido
+            cursor.execute('SELECT * FROM funcionários WHERE idFuncionários = %s;', (funcionario_id,))
+            funcionario_escolhido = cursor.fetchone()
 
-            # Obter os valores do formulário
-            total_pecas = request.form.get('total_peças', 0)  # Valor padrão de 0 caso não seja enviado
-            valor_comissao = request.form.get('valor_comissão', 0)  # Valor padrão de 0 caso não seja enviado
+            if funcionario_escolhido:
+                # Atualizar as peças no banco de dados
+                total_pecas_atual = funcionario_escolhido[4] if funcionario_escolhido[4] is not None else 0
+                total_comissao_atual = funcionario_escolhido[5] if funcionario_escolhido[5] is not None else 0
 
-            # Recuperar os valores do banco de dados e substituir None por 0
-            total_pecas_db = funcionario_escolhido[0][5] if funcionario_escolhido[0][5] is not None else 0
-            valor_comissao_db = funcionario_escolhido[0][6] if funcionario_escolhido[0][6] is not None else 0
+                # Variável para somar as peças inseridas com as que já estão cadastradas
+                novo_total_pecas = total_pecas_atual + total_pecas
 
-            # Somar os valores antigos com os novos
-            novo_total_pecas = total_pecas_db + int(total_pecas)  # Soma de total_peças
-            novo_valor_comissao = valor_comissao_db + float(valor_comissao)  # Soma de valor_comissão
+                # Variavél para somar a comissão que já esta cadastrada com a comissão das novas peças inseridas
+                novo_total_comissao = total_comissao_atual + total_comissao
 
-            # Atualiza o banco de dados com os valores acumulados
-            comando = """UPDATE funcionários 
-                                               SET total_peças = %s, valor_comissão = %s 
-                                               WHERE nome = %s;"""
-            cursor.execute(comando, (novo_total_pecas, novo_valor_comissao, funcionario_escolhido[0][0]))
-            conexao.commit()
-            conexao.close()
-            flash('Valores adicionados com sucesso!', 'sucess')
+                # O 'datetime.now()' pega o momento atual e 'strftime' formata esse valor
+                # como uma string no formato especificado.
+                data_comissao = datetime.now().strftime('%Y-%m-%d')
 
-            return render_template('funcionarios_atualizar.html', funcionario=funcionario_escolhido)
+                # Comando em SQL para atualizar a coluna total_peças e valor_comissão do funcionários escolhido
+                cursor.execute('''UPDATE funcionários 
+                                  SET total_peças = %s, valor_comissão = %s 
+                                  WHERE idFuncionários = %s;''',
+                               (novo_total_pecas, novo_total_comissao, funcionario_id))
+                conexao.commit()  # Commita o feito realizado
 
+                # Comando em SQL para inserir as atualizações em uma tabela específica com a chave estrangeira do ID
+                # do funcionário
+                cursor.execute(
+
+                    '''INSERT INTO comissoes (idFuncionários, data_comissao, total_pecas, valor_comissao)
+                                                      VALUES (%s, %s, %s, %s);''',
+                    (funcionario_id, data_comissao, total_pecas, total_comissao))
+
+                conexao.commit()  # Commita o feito realizado
+                flash('Número de peças atualizado com sucesso!', 'success')  # Mensagem de sucesso
+
+        # Se não for escolhido nenhum funcionário
         else:
-            flash('Funcionário não encontrado!', 'error')
+            flash('Por favor, selecione um funcionário.', 'error')  # Mensagem de erro
 
-    return render_template('funcionarios_atualizar.html', funcionario=funcionario)
+    # Carregar todos os funcionários para exibir na lista
+    cursor.execute('SELECT * FROM funcionários')
+
+    funcionarios = cursor.fetchall()
+    conexao.close()  # Fecha a conexão com o cursor
+    conexao.close()
+
+    # Retorna ao template o resultado de todo o procedimento
+    return render_template('funcionarios_atualizar.html', funcionarios=funcionarios)
 
 
+# Rota para excluir um funcionário
 @app.route('/excluir_funcionario', methods=['GET', 'POST'])
 def excluir_funcionario():
+    """Função para excluir um funcionário específico, o nome é passado a requisição para a busca
+    se encontrado executa a ação de exclusão"""
+
+    # Conexão com o banco de dados
     conexao = conexao_bd()
     cursor = conexao.cursor()
     funcionario = None
@@ -435,7 +481,6 @@ def relatorio_orcamentos():
         cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
         resultados = cursor.fetchall()
 
-
         query = """
                SELECT SUM(valor_orcamento) 
                FROM clientes
@@ -444,8 +489,8 @@ def relatorio_orcamentos():
         cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
         total_entradas = cursor.fetchone()[0] or 0
 
-        message = (f'Foram realizados {len(resultados)} Orçamentos.<br>'
-                   f'Total: R${total_entradas:.2f}')
+        flash(f'Foram realizados {len(resultados)} Orçamentos.<br>'
+              f'Total: R${total_entradas:.2f}')
 
         if not resultados:
             flash('Não foi encontrado nenhum orçamento dentro do período!', 'error')
@@ -544,13 +589,65 @@ def relatorio_despesas():
     return render_template('relatorio_despesas.html', despesa=despesa, total_despesas=total_despesas)
 
 
-'''@app.route('/relatorio_geral', methods=['GET', 'POST'])
-def relatorio_geral():
-    conexao = conexao_bd()
+@app.route('/relatorio_comissao', methods=['GET', 'POST'])
+def relatorio_comissao():
+    funcionario = None
+    conexao = conexao_bd()  # Conexão ao banco de dados
     cursor = conexao.cursor()
 
     if request.method == 'POST':
-        data_inicio = request.form.get('')'''
+        # Pegar as datas do formulário
+        data_inicio = request.form.get('data_inicio')
+        data_fim = request.form.get('data_fim')
+        gerar_excel = request.form.get('gerar_excel')
+
+        # Validação: Data de início não pode ser maior que a data de fim
+        if data_fim < data_inicio:
+            flash('A data final não pode ser menor que a data de início!', 'error')
+            return render_template('relatorio_comissao.html')
+
+        if data_inicio and data_fim:
+            # Converter strings de data para objetos datetime
+            data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d')
+            data_fim = datetime.strptime(data_fim, '%Y-%m-%d')
+
+            # Consulta SQL para buscar os dados de comissão no período
+            query = """
+                SELECT f.idFuncionários, f.nome, f.cargo, c.total_pecas, c.valor_comissao, c.data_comissao
+                    FROM funcionários f
+                    JOIN comissoes c ON f.idFuncionários = c.idFuncionários
+                    WHERE c.data_comissao BETWEEN %s AND %s
+            """
+
+            # Executar a consulta
+            cursor.execute(query, (data_inicio.strftime('%Y-%m-%d'), data_fim.strftime('%Y-%m-%d')))
+            funcionario = cursor.fetchall()
+            print(funcionario)
+
+        if gerar_excel:
+            colunas = ["Id", "Nome", "Cargo", "Total Peças", "Valor Comissão", "Data da Comissão"]
+            df = pd.DataFrame(funcionario, columns=colunas)
+
+            output = BytesIO()
+            df.to_excel(output, index=False, sheet_name='Relatório de Comissão')
+            output.seek(0)
+
+            response = make_response(output.getvalue())
+            response.headers["Content-Disposition"] = "attachment; filename=relatorio_comissões.xlsx"
+            response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            flash('Arquivo gerado com sucesso!', 'sucess')
+            return response
+
+        if not funcionario:
+            flash('Não foi encontrado nenhum dado entre o período!', 'error')
+            return render_template('relatorio_comissao.html')
+
+    # Fechar conexão com o banco de dados
+    conexao.close()
+    cursor.close()
+
+    # Renderizar a página com os dados
+    return render_template('relatorio_comissao.html', funcionario=funcionario)
 
 
 @app.route('/despesas', methods=['GET', 'POST'])
@@ -612,7 +709,7 @@ def excluir_despesa():
 
 @app.route('/calcular_orcamento', methods=['GET', 'POST'])
 def calcular_orcamento():
-    preco_venda = None
+
     if request.method == 'POST':
         valor_orcamento = request.form.get('valor_orcamento')
         valor_despesa = request.form.get('valor_despesas')
