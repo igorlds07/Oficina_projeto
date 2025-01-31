@@ -1,59 +1,74 @@
+
 # Sistema de Gestão de Oficina Automotiva
 
-Este projeto é uma aplicação web desenvolvida com o framework Flask. A aplicação tem como objetivo gerenciar clientes de uma oficina automotiva, permitindo funcionalidades como cadastro, edição, exclusão e consulta de clientes, além de um sistema de login para administradores.
+Este é um sistema web desenvolvido com o framework Flask, projetado para automatizar o gerenciamento de uma oficina automotiva. A aplicação permite o controle de clientes, funcionários, caixa diário, comissões, cálculos de orçamentos e muito mais.
 
 ## Funcionalidades
 
-- **Login de Administrador:** Apenas administradores (donos da oficina) podem acessar as funcionalidades de gerenciamento.
-- **Cadastro de Clientes:** Permite cadastrar informações como nome, contato, veículo, data de entrada e saída, e valor do orçamento.
-- **Edição de Clientes:** O administrador pode atualizar as informações de clientes já cadastrados.
-- **Exclusão de Clientes:** O administrador pode excluir registros de clientes do banco de dados.
-- **Visualização de Clientes:** Permite consultar clientes cadastrados e exibir todos os clientes ou um cliente específico.
-- **Cadastro e Edição de Funcionários:** O administrador pode cadastrar e editar informações de funcionários, como nome, cargo e dados de contato.
-- **Geração de Relatórios:** O administrador pode gerar relatórios de clientes cadastrados e serviços prestados.
+### 1. **Gestão de Clientes**
+- **Cadastro de Clientes:** Cadastro de informações dos clientes, como nome, veículo, dados de contato e detalhes do orçamento.
+- **Edição de Clientes:** Atualização das informações dos clientes cadastrados.
+- **Exclusão de Clientes:** Exclui um cliente da base de dados.
+- **Consulta de Clientes:** Permite visualizar todos os clientes ou realizar buscas específicas.
+
+### 2. **Gestão de Funcionários**
+- **Cadastro de Funcionários:** Cadastro e edição de informações de funcionários, como nome, cargo e dados de contato.
+- **Edição de Funcionários:** Atualização dos dados dos funcionários cadastrados.
+- **Exclusão de Funcionários:** Exclui o funcionário escolhido pelo administrador.
+
+### 3. **Comissões**
+- **Cálculo de Comissão:** Calcula as comissões devidas aos funcionários com base no número de peças feitas ou serviços prestados.
+- **Relatório de Comissões:** Geração de relatórios detalhados sobre as comissões de cada funcionário. O relatório inclui informações como o valor total de comissão de cada funcionário, data e serviços associados, facilitando o acompanhamento e pagamento das comissões devidas.
+
+### 4. **Caixa Diário**
+- **Controle do Caixa Diário:** Registra entradas e saídas de dinheiro ao longo do dia, permitindo um controle financeiro completo do movimento diário da oficina.
+
+### 5. **Despesas**
+- **Controle de Despesas:** Registra as despesas da oficina, como compras de peças, pagamentos de salários e outros custos operacionais, permitindo que o administrador monitore os gastos e mantenha o controle financeiro.
+
+### 6. **Cálculo de Orçamentos**
+- **Cálculo de Orçamento:** O sistema calcula automaticamente o valor final do orçamento para o cliente, levando em consideração os custos de peças, serviços prestados e despesas adicionais. O valor total pode incluir uma margem de lucro definida pelo administrador.
+
+### 7. **Geração de Relatórios**
+- **Relatórios de Clientes:** Geração de relatórios sobre os clientes cadastrados e serviços prestados.
+- **Relatórios de Despesas:** Geração de relatórios detalhados sobre as despesas da oficina, facilitando o acompanhamento dos custos.
+- **Relatórios de Comissões:** Geração de relatórios sobre as comissões de funcionários, incluindo o valor total de comissão de cada funcionário, por serviço ou venda realizada.
+- **Relatórios de Orçamentos:** Geração de relatórios sobre os orçamentos realizados, incluindo o cálculo do valor final.
+- **Exportação de Relatórios para Excel:** Possibilidade de exportar dados de clientes, serviços, orçamentos, comissões e despesas para arquivos Excel, tornando mais fácil o gerenciamento e análise de dados.
+
+### 8. **Relatórios Personalizados**
+- **Exportação de Relatórios em Formatos Diversos:** Além de Excel, a aplicação permite exportar relatórios em formato PDF e CSV.
 
 ## Tecnologias Utilizadas
 
-- **Flask:** Framework web utilizado para a construção da aplicação.
-- **MySQL:** Sistema de gerenciamento de banco de dados utilizado para armazenar as informações dos clientes e funcionários.
-- **HTML / Jinja2:** Para renderizar as páginas da aplicação web.
-- **CSS:** Para o estilo visual da aplicação.
+- **Flask:** Framework para desenvolvimento web.
+- **MySQL:** Banco de dados para armazenamento das informações.
+- **Pandas:** Biblioteca para geração de relatórios e exportação para Excel.
+- **HTML / CSS:** Desenvolvimento do front-end da aplicação.
 
-## Estrutura do Projeto
+## Como Rodar o Projeto
 
-A aplicação possui as seguintes funcionalidades principais:
+1. **Clonar o Repositório:**
+   ```bash
+   git clone <URL_do_repositório>
+   cd <nome_da_pasta>
+   ```
 
-1. **Login de Administrador:**
-   - Rota: `/`
-   - Verifica o login e senha do administrador, autenticando o acesso ao sistema.
+2. **Instalar Dependências:**
+   Crie um ambiente virtual e instale as dependências necessárias:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # No Windows: venv\Scriptsctivate
+   pip install -r requirements.txt
+   ```
 
-2. **Cadastro de Clientes:**
-   - Rota: `/cadastro`
-   - Permite o cadastro de novos clientes no banco de dados.
-   - O formulário coleta informações como nome, contato, veículo, data de entrada, data de saída e valor do orçamento.
+3. **Configurar Banco de Dados:**
+   Garanta que o MySQL esteja rodando e configure a conexão no arquivo `config.py`.
 
-3. **Edição de Clientes:**
-   - Rota: `/editar/<int:id>`
-   - Permite editar os dados de um cliente já cadastrado.
+4. **Rodar o Servidor:**
+   ```bash
+   flask run
+   ```
 
-4. **Exclusão de Clientes:**
-   - Rota: `/excluir_cliente/<int:id>`
-   - Permite excluir um cliente do banco de dados, após confirmação do administrador.
-
-5. **Consulta de Clientes:**
-   - Rota: `/clientes`
-   - Permite visualizar todos os clientes cadastrados ou buscar um cliente específico pelo nome.
-
-6. **Cadastro de Funcionários:**
-   - Rota: `/cadastro_funcionario`
-   - Permite cadastrar novos funcionários, com informações como nome, cargo e dados de contato.
-
-7. **Edição de Funcionários:**
-   - Rota: `/editar_funcionario/<int:id>`
-   - Permite editar as informações de um funcionário já cadastrado.
-
-8. **Relatórios:**
-   - Rota: `/relatorios`
-   - Permite gerar relatórios sobre os clientes cadastrados e os serviços prestados, com a possibilidade de exportar os dados em formato PDF ou CSV.
-
+A aplicação estará disponível em [http://localhost:5000](http://localhost:5000).
 
